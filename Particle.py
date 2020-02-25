@@ -17,34 +17,43 @@ class Particle:
     c = scipy.constants.speed_of_light
 
     
-    def __init__(self, Position=np.array([0,0,0], dtype=float), Velocity=np.array([0,0,0], dtype=float),
-    Acceleration=np.array([0,0,0], dtype=float), Name='A Particle', RestMass=1.0, Charge=Particle.e):
+    def __init__(self, position=np.array([0,0,0], dtype=float),
+     velocity=np.array([0,0,0], dtype=float), acceleration=np.array([0,0,0],
+      dtype=float), name='A Particle', restMass=1.0, charge=Particle.e):
 
-        self.name = Name
-        self.position = np.array(Position,dtype=float)
-        self.velocity = np.array(Velocity,dtype=float)
-        self.acceleration = np.array(Acceleration,dtype=float)
-        self.restMass = RestMass
-        self.charge = Charge
+        self.name = name
+        self.position = np.array(position, dtype=float)
+        self.velocity = np.array(velocity, dtype=float)
+        self.acceleration = np.array(acceleration, dtype=float)
+        self.restMass = restMass
+        self.charge = charge
 
     def __repr__(self):
-        return 'Particle: {0}, Rest Mass: {1:12.3e}, Position: {2}, Velocity: {3}, Acceleration: {4}, Charge: {5:12.3e}'.format(
-            self.name, self.restMass, self.position, self.velocity, self.acceleration, self.charge)
+        return 'Particle: {0}, rest Mass: {1:12.3e}, position: {2}, \
+        velocity: {3}, acceleration: {4}, charge: {5:12.3e}'.format(
+        self.name, self.restMass, self.position,
+         self.velocity, self.acceleration, self.charge)
+
+    def BetaVector(self):
+        return self.velocity / Particle.c
 
     def LorentzFactor(self):
-        return 1 / (1 - math.sqrt(1 - np.vdot(self.velocity,self.velocity) / (Particle.c * Particle.c)))
+        return 1 / (1 - math.sqrt(1 - np.linalg.norm(Particle.BetaVector(self))
+        * np.linalg.norm(Particle.BetaVector(self))))
 
     def Momentum(self):
-        return Particle.LorentzFactor(self)*self.restMass*np.array(self.velocity,dtype=float)
+        return (Particle.LorentzFactor(self) * self.restMass
+        * np.array(self.velocity,dtype=float))
     
-    def RestEnergy(self):
+    def restEnergy(self):
         return (self.restMass * Particle.c * Particle.c)
 
     def TotalEnergy(self):
-        return math.sqrt((Particle.RestEnergy(self) ** 2) + (Particle.Momentum(self)*Particle.c) ** 2)
+        return (math.sqrt((Particle.restEnergy(self) ** 2)
+        + (Particle.Momentum(self) * Particle.c) ** 2))
     
     def KineticEnergy(self):
-        return Particle.TotalEnergy(self) - Particle.RestEnergy(self)
+        return Particle.TotalEnergy(self) - Particle.restEnergy(self)
   
     def Update(self, deltaT):
         #Euler forward
