@@ -24,5 +24,5 @@ class ElectricFieldClass(AbstractFieldClass):
         #particleBunch:ParticleBunch states that the argument, particleBunch
         #is actually the ParticleBunch class! Nice.
         for i in particleBunch.listOfParticles:
-            i.acceleration = i.charge * self.fieldStrength / i.restMass
+            i.acceleration = i.charge * self.fieldStrength / i.RelativisticMass()
 

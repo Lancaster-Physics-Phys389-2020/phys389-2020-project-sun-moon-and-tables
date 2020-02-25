@@ -33,20 +33,25 @@ class Particle:
         self.name, self.restMass, self.position,
          self.velocity, self.acceleration, self.charge)
 
+    def restEnergy(self):
+        return (self.restMass * const.speed_of_light * const.speed_of_light)
+
     def BetaVector(self):
-        return self.velocity /const.speed_of_light
+        return self.velocity / const.speed_of_light
 
     def LorentzFactor(self):
-        return 1 / (1 - math.sqrt(1 - np.linalg.norm(Particle.BetaVector(self))
-        * np.linalg.norm(Particle.BetaVector(self))))
+        return 1 / abs( 1 - np.linalg.norm(Particle.BetaVector(self))
+         * np.linalg.norm(Particle.BetaVector(self)) ** 0.5)
+    # note, by not using math.sqrt, if we end up with beta^2 > 1, this function
+    # will not throw an error. We seem to be very close to staying under c,
+    # And that seems to have fixed it!
+    def RelativisticMass(self):
+        return Particle.LorentzFactor(self) * self.restMass
 
     def Momentum(self):
         return (Particle.LorentzFactor(self) * self.restMass
         * np.array(self.velocity,dtype=float))
     
-    def restEnergy(self):
-        return (self.restMass * const.speed_of_light * const.speed_of_light)
-
     def TotalEnergy(self):
         return (math.sqrt((Particle.restEnergy(self) ** 2)
         + (Particle.Momentum(self) * const.speed_of_light) ** 2))
@@ -55,8 +60,13 @@ class Particle:
         return Particle.TotalEnergy(self) - Particle.restEnergy(self)
   
     def Update(self, deltaT):
-        #Euler forward
+        #Euler forward? Euler Cromer?
         self.position +=  self.velocity*deltaT
         self.velocity +=  self.acceleration*deltaT
+    
+    def Update2(self, deltaT):
+        #Euler forward? Euler Cromer?
+        self.velocity +=  self.acceleration*deltaT
+        self.position +=  self.velocity*deltaT
 
  
