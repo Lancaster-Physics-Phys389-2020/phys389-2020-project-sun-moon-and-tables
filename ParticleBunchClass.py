@@ -23,15 +23,23 @@ class ParticleBunch(object):
         return 'Name of Bunch: {0}, Bunch of Particles: {1}, Spread of Bunch: {2} \
         , Mean Energy of Bunch: {3}'.format(self.name, self.listOfParticles
         , self.bunchSpread, self.bunchMeanEnergy)
-        
-    def FindBunchSpread(self):
-        pass
     
     def FindBunchMeanEnergy(self):
-        pass
+        totalEnergy = 0.0
+        for i in range(len(self.listOfParticles)):
+            totalEnergy += self.listOfParticles[i].TotalEnergy()
+        return (totalEnergy / float(len(self.listOfParticles)))
+
+    def FindBunchEnergySpread(self):
+        # find the standard deviation of the energy of particles
+        # we'll use numpy methods for this.
+        spreadArray = np.array([])
+        for i in range(len(self.listOfParticles)):
+            spreadArray = np.append(spreadArray, self.listOfParticles[i].TotalEnergy())
+        return np.std(spreadArray)
 
     def FindBunchMeanVelocity(self):
-        totalVelocity = 0
+        totalVelocity = 0.0
         for i in range(len(self.listOfParticles)):
             totalVelocity += self.listOfParticles[i].velocity
         return (totalVelocity / float(len(self.listOfParticles)))

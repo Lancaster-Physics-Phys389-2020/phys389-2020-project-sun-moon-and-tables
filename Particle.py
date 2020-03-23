@@ -59,7 +59,7 @@ class Particle:
     
     def TotalEnergy(self):
         return (math.sqrt((Particle.restEnergy(self) ** 2)
-        + (Particle.Momentum(self) * const.speed_of_light) ** 2))
+        + (np.linalg.norm(Particle.Momentum(self)) * const.speed_of_light) ** 2))
     
     def KineticEnergy(self):
         return Particle.TotalEnergy(self) - Particle.restEnergy(self)

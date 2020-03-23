@@ -4,6 +4,7 @@ from ParticleBunchClass import ParticleBunch, Particle
 from SumEMFields import EMFieldClass
 
 import scipy.constants as const
+import scipy
 import numpy as np
 import time
 import pandas as pd
@@ -12,11 +13,19 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from copy import deepcopy 
 
-firstEField = ElectricExternalFieldClass(electricFieldStrength=np.array([0, 1e-1, 0])
-, angularFrequency=0.0, name='First Time Varying Electric Field')
+firstEField = ElectricExternalFieldClass(electricFieldStrength=np.array([1e-3, 0, 0])
+, listOfDimensions=[[-200, 200], [-1 * scipy.inf, scipy.inf], [-1 * scipy.inf, scipy.inf]]
+, name='First Time Varying Electric Field')
 
+secondEField = ElectricExternalFieldClass(electricFieldStrength=np.array([-61e-4, 0, 0])
+, listOfDimensions=[[50, 200], [-1 * scipy.inf, scipy.inf], [-1 * scipy.inf, scipy.inf]]
+, name='Second Time Varying Electric Field')
+# note if you don't specify dimensions, it automatically assumes that it is a field
+# across all space.
+#in addition, if you don't specify angular frequency ie, the field doesn't
+# change in time, it assumes a frequency of zero and hence no changing field.
 firstBField = MagneticExternalFieldClass(magneticFieldStrength=np.array([1e-5, 0, 0])
-, angularFrequency=0.0, name='First Time Varying Magnetic Field')
+, name='First Time Varying Magnetic Field')
 
 firstParticle = Particle(position=np.array([0, 0, 1e-10])
 , velocity=np.array([1, 10, 0]), acceleration=np.array([0, 0, 0])
@@ -30,7 +39,7 @@ firstParticleBunch = ParticleBunch([firstParticle, secondParticle], 0, 0, 'First
 
 collectionBField = [firstBField]
 
-collectionEField = [firstEField]
+collectionEField = [firstEField, secondEField]
 
 totalEMField = EMFieldClass(bunchOfParticles=firstParticleBunch
 , listOfElectricFields=collectionEField, listOfMagneticFields=collectionBField
@@ -45,11 +54,10 @@ def ApplyFieldSomeSeconds(duration):
     timeElapsed = 0.0
     
     while timeElapsed < duration:
+        # perhaps consider what Ryan suggested with a variable timestep depending on
+        # whether the particle is being acceleraed by the electric field
         timestep = 1e-4
         simulationState.append(deepcopy(firstParticleBunch.listOfParticles)) 
-        #print(firstParticleBunch.listOfParticles)
-        #print(timestep)
-        # ask Bertram / Ryan / stack overflow for why
         simulationTime.append(deepcopy(timeElapsed)) 
         # deepcopy is required to make sure that the "append problem" 
         # is not realised
@@ -76,9 +84,11 @@ def ThreeDPositionPlot(pickledFile:str,figureTitle:str, listOfAxisTitles:list):
     # creates a list per particle.
     for i in range(lengthOfSimulation):
         for j in range(numberOfParticles):
-                inputData[j][0].append(LoadSim.Simulation[i][j].position[0])
-                inputData[j][1].append(LoadSim.Simulation[i][j].position[1])
-                inputData[j][2].append(LoadSim.Simulation[i][j].position[2])
+            for k in range(3):
+                inputData[j][k].append(LoadSim.Simulation[i][j].position[k])
+                # so this is the one line that does position. could swap this out
+                # for different simulation properties.
+
     fig = plt.figure()
     ax = fig.gca(projection='3d')
     for j in range(numberOfParticles):
@@ -92,7 +102,7 @@ def ThreeDPositionPlot(pickledFile:str,figureTitle:str, listOfAxisTitles:list):
     plt.show()
 
 start = time.time()
-ApplyFieldSomeSeconds(1e-1) # WARNING, A LONG SIMULATION SEEMS TO STOP THE PLOTTING FROM WORKING!
+ApplyFieldSomeSeconds(1) # WARNING, A LONG SIMULATION SEEMS TO STOP THE PLOTTING FROM WORKING!
 end = time.time()
 print("Time to simulate is", end - start, "seconds")
 fileName = "fuckMe"
