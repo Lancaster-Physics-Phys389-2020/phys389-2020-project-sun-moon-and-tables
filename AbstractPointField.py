@@ -21,7 +21,7 @@ class AbstractPointFieldClass(ABC, GenericFieldClass):
     # we do intend to overwrite it... so...
 
     @abstractmethod
-    def generateField(self):
+    def GenerateField(self):
         pass
     # this makes sense to be an abstract method, as it absolutely has to be overwritten
     # for the electric and magnetic fields, as they are totally different equations.

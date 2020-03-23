@@ -35,10 +35,10 @@ class Particle:
     def __repr__(self):
         return 'Particle: {0}, rest Mass: {1:12.3e}, position: {2}, \
         velocity: {3}, acceleration: {4}, charge: {5:12.3e}'.format(
-        self.name, self.restMass, self.position,
-         self.velocity, self.acceleration, self.charge)
+        self.name, self.restMass, self.position
+        , self.velocity, self.acceleration, self.charge)
 
-    def restEnergy(self):
+    def RestEnergy(self):
         return (self.restMass * const.speed_of_light * const.speed_of_light)
 
     def BetaVector(self):
@@ -59,28 +59,28 @@ class Particle:
     
     def TotalEnergy(self):
         return (math.sqrt((Particle.restEnergy(self) ** 2)
-        + (Particle.Momentum(self) * const.speed_of_light) ** 2))
+        + (np.linalg.norm(Particle.Momentum(self)) * const.speed_of_light) ** 2))
     
     def KineticEnergy(self):
         return Particle.TotalEnergy(self) - Particle.restEnergy(self)
   
     def Update(self, deltaT):
-        #Euler forward? Euler Cromer?
-        self.position +=  self.velocity*deltaT
-        self.velocity +=  self.acceleration*deltaT
+        #Euler Forward
+        self.position +=  self.velocity * deltaT
+        self.velocity +=  self.acceleration * deltaT
     
     def Update2(self, deltaT):
-        #Euler forward? Euler Cromer?
-        self.velocity +=  self.acceleration*deltaT
-        self.position +=  self.velocity*deltaT
+        #Euler Cromer
+        self.velocity +=  self.acceleration * deltaT
+        self.position +=  self.velocity * deltaT
     
     ### This is the section of code where I am trying to get my particles to
     ### generate electromagnetic fields around themselves.
-    def generateElectricField(self, affectedParticle):
-        return self.electricField.generateField(affectedParticle)
+    def GenerateElectricField(self, affectedParticle):
+        return self.electricField.GenerateField(affectedParticle)
     # I think we don't need to pass the source of the field as an argument.
     # this particle IS the source of the field. It has all the parameters
     # that it would need to function.
-    def generateMagneticField(self, affectedParticle):
-        return self.magneticField.generateField(affectedParticle)
+    def GenerateMagneticField(self, affectedParticle):
+        return self.magneticField.GenerateField(affectedParticle)
  
