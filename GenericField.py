@@ -1,7 +1,6 @@
 import numpy as np
 from abc import ABC, abstractmethod
 
-
 #note for modelling the dimensions that a field exists in:
 #source 1: http://archive.petercollingridge.co.uk/book/export/html/460
 #could do it with this.. just might need a lot of rectangles. 
@@ -9,7 +8,7 @@ from abc import ABC, abstractmethod
 #particles and then shoot them out.
 #ask bertram.
 
-class AbstractFieldClass(ABC):
+class GenericFieldClass:
     """Class to model any field. Might need a parent class to help define where it comes from, 
     and to properly simulate things, might need a way of implementing a way of limiting where the
     field can act. Some kind of parent class that provides dimensions?
@@ -20,17 +19,11 @@ class AbstractFieldClass(ABC):
     A generic field needs to act over all of the particles in the simulation! Silly! That's
     how these things work!
     """
-    def __init__(self, fieldStrength = np.array([0, 0, 0], dtype = float)
-    , name = 'Generic Field'):
-        self.fieldStrength = fieldStrength
+    
+    def __init__(self, name='Generic Field'):
         self.name = name
 
-    @abstractmethod
     def __repr__(self):
-        return 'Generic Field: {0}, Field Strength: {1}'.format(self.name
-        , self.fieldStrength)
+        return 'Field: {0}'.format(self.name)
 
-    @abstractmethod
-    def GiveAcceleration(self, theParticle):
-        pass
     

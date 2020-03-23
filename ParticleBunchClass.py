@@ -12,8 +12,8 @@ class ParticleBunch(object):
     So maybe this is a class where class methods could be used? Not totally sure.
     """
 
-    def __init__(self, listOfParticles = [], bunchSpread = 0.0
-     , bunchMeanEnergy = 0.0, name = 'Bunch Name'):
+    def __init__(self, listOfParticles = [Particle], bunchSpread = 0.0
+    , bunchMeanEnergy = 0.0, name = 'Bunch Name'):
         self.listOfParticles = listOfParticles
         self.bunchSpread = bunchSpread
         self.bunchMeanEnergy = bunchMeanEnergy
@@ -29,4 +29,11 @@ class ParticleBunch(object):
     
     def FindBunchMeanEnergy(self):
         pass
+
+    def FindBunchMeanVelocity(self):
+        totalVelocity = 0
+        for i in range(len(self.listOfParticles)):
+            totalVelocity += self.listOfParticles[i].velocity
+        return (totalVelocity / float(len(self.listOfParticles)))
+
 
