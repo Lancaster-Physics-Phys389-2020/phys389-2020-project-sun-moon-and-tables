@@ -10,9 +10,9 @@ import pandas as pd
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
-from copy import deepcopy
+from copy import deepcopy 
 
-firstEField = ElectricExternalFieldClass(electricFieldStrength=np.array([0, 0, 0])
+firstEField = ElectricExternalFieldClass(electricFieldStrength=np.array([0, 1e-1, 0])
 , angularFrequency=0.0, name='First Time Varying Electric Field')
 
 firstBField = MagneticExternalFieldClass(magneticFieldStrength=np.array([1e-5, 0, 0])
@@ -30,7 +30,7 @@ firstParticleBunch = ParticleBunch([firstParticle, secondParticle], 0, 0, 'First
 
 collectionBField = [firstBField]
 
-collectionEField = []
+collectionEField = [firstEField]
 
 totalEMField = EMFieldClass(bunchOfParticles=firstParticleBunch
 , listOfElectricFields=collectionEField, listOfMagneticFields=collectionBField
