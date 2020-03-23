@@ -1,7 +1,8 @@
 import numpy as np
 import math
 import scipy.constants as const
-
+from PointMagneticField import PointMagneticFieldClass
+from PointElectricField import PointElectricFieldClass
 
 class Particle:
     """Regular class. For now.
@@ -26,6 +27,10 @@ class Particle:
         self.acceleration = np.array(acceleration, dtype=float)
         self.restMass = restMass
         self.charge = charge
+        self.electricField = PointElectricFieldClass(sourceParticle=self
+        , name='Field from %s'%(self.name))
+        self.magneticField = PointMagneticFieldClass(sourceParticle=self
+        , name='Field from %s'%(self.name))
 
     def __repr__(self):
         return 'Particle: {0}, rest Mass: {1:12.3e}, position: {2}, \
@@ -44,7 +49,7 @@ class Particle:
          * np.linalg.norm(Particle.BetaVector(self)) ** 0.5)
     # note, by not using math.sqrt, if we end up with beta^2 > 1, this function
     # will not throw an error. We seem to be very close to staying under c,
-    # And that seems to have fixed it!
+    # . . . And that seems to have fixed it!
     def RelativisticMass(self):
         return Particle.LorentzFactor(self) * self.restMass
 
@@ -68,5 +73,14 @@ class Particle:
         #Euler forward? Euler Cromer?
         self.velocity +=  self.acceleration*deltaT
         self.position +=  self.velocity*deltaT
-
+    
+    ### This is the section of code where I am trying to get my particles to
+    ### generate electromagnetic fields around themselves.
+    def generateElectricField(self, affectedParticle):
+        return self.electricField.generateField(affectedParticle)
+    # I think we don't need to pass the source of the field as an argument.
+    # this particle IS the source of the field. It has all the parameters
+    # that it would need to function.
+    def generateMagneticField(self, affectedParticle):
+        return self.magneticField.generateField(affectedParticle)
  
