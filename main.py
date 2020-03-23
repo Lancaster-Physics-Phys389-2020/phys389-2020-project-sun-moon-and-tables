@@ -38,7 +38,7 @@ secondParticle = Particle(position=np.array([0, 0, 0])
 , name='Proton2', restMass=const.proton_mass, charge=1 * const.elementary_charge)
 """
 
-firstParticleBunch = ParticleBunch(numberOfParticles=10, bunchSpread=1e-23
+firstParticleBunch = ParticleBunch(numberOfParticles=10, bunchSpread=1e-26
 , bunchMeanEnergy=1.503277592896106e-10, restMassOfBunch=const.proton_mass, chargeOfBunch=const.elementary_charge
 , name='Proton')
 firstParticleBunch.CreateListOfParticles()
