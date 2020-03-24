@@ -16,7 +16,7 @@ from copy import deepcopy
 firstEField = ElectricExternalFieldClass(electricFieldStrength=np.array([1e-3, 0, 0])
 , name='First Time Varying Electric Field')
 
-secondEField = ElectricExternalFieldClass(electricFieldStrength=np.array([-61e-4, 0, 0])
+secondEField = ElectricExternalFieldClass(electricFieldStrength=np.array([-1e-4, 0, 0])
 , name='Second Time Varying Electric Field')
 # note if you don't specify dimensions, it automatically assumes that it is a field
 # across all space.
@@ -25,7 +25,7 @@ secondEField = ElectricExternalFieldClass(electricFieldStrength=np.array([-61e-4
 firstBField = MagneticExternalFieldClass(magneticFieldStrength=np.array([1e-4, 0, 0])
 , name='First Time Varying Magnetic Field')
 
-secondBField = MagneticExternalFieldClass(magneticFieldStrength=np.array([0, 1e-4, 0])
+secondBField = MagneticExternalFieldClass(magneticFieldStrength=np.array([0, 1e-6, 0])
 , name='First Time Varying Magnetic Field')
 
 """
@@ -38,13 +38,13 @@ secondParticle = Particle(position=np.array([0, 0, 0])
 , name='Proton2', restMass=const.proton_mass, charge=1 * const.elementary_charge)
 """
 
-firstParticleBunch = ParticleBunch(numberOfParticles=10, bunchSpread=1e-26
+firstParticleBunch = ParticleBunch(numberOfParticles=5, bunchSpread=1e-26
 , bunchMeanEnergy=1.503277592896106e-10, restMassOfBunch=const.proton_mass, chargeOfBunch=const.elementary_charge
 , name='Proton')
 firstParticleBunch.CreateListOfParticles()
 # 1.503277592896106e-10 J of energy to initialise the particles with a mean velocity of 100 m/s
 
-collectionBField = []
+collectionBField = [secondBField]
 
 collectionEField = []
 
