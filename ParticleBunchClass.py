@@ -23,6 +23,8 @@ class ParticleBunch(object):
         self.name = name
         self.restMassOfBunch = restMassOfBunch
         self.chargeOfBunch = chargeOfBunch
+        
+        self.CreateListOfParticles()
 
     def __repr__(self):
         return 'Name of Particle in bunch: {0}, Bunch of Particles: {1}, Spread of Bunch: {2} \

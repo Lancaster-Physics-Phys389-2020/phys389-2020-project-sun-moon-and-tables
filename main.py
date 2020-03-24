@@ -41,7 +41,6 @@ secondParticle = Particle(position=np.array([0, 0, 0])
 firstParticleBunch = ParticleBunch(numberOfParticles=5, bunchSpread=1e-26
 , bunchMeanEnergy=1.503277592896106e-10, restMassOfBunch=const.proton_mass, chargeOfBunch=const.elementary_charge
 , name='Proton')
-firstParticleBunch.CreateListOfParticles()
 # 1.503277592896106e-10 J of energy to initialise the particles with a mean velocity of 100 m/s
 
 collectionBField = [secondBField]
