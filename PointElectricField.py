@@ -15,7 +15,7 @@ class PointElectricFieldClass(AbstractPointFieldClass):
         return 'Electric Point Field: {0}, Source Particle of Electric Field: {1}'.format(
             self.name, self.sourceParticle)
     
-    def generateField(self, affectedParticle):
+    def GenerateField(self, affectedParticle):
         displacement = affectedParticle.position - self.sourceParticle.position
         distance = np.linalg.norm(displacement)
         return (const.epsilon_0 / (4 * const.pi)

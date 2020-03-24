@@ -31,13 +31,13 @@ class EMFieldClass(object):
         sumE = np.array([0, 0, 0], dtype=float)
         sumB = np.array([0, 0, 0], dtype=float)
         for i in range(len(self.listOfElectricFields)):
-            sumE += self.listOfElectricFields[i].generateField(timeElapsed)
+            sumE += self.listOfElectricFields[i].GenerateField(timeElapsed, affectedParticle)
         for j in range(len(self.listOfMagneticFields)):
-            sumB += self.listOfMagneticFields[j].generateField(timeElapsed)
+            sumB += self.listOfMagneticFields[j].GenerateField(timeElapsed, affectedParticle)
         for k in range(len(self.bunchOfParticles.listOfParticles)):
             if affectedParticle != self.bunchOfParticles.listOfParticles[k]:
-                sumE += self.bunchOfParticles.listOfParticles[k].generateElectricField(affectedParticle)
-                sumB += self.bunchOfParticles.listOfParticles[k].generateMagneticField(affectedParticle)
+                sumE += self.bunchOfParticles.listOfParticles[k].GenerateElectricField(affectedParticle)
+                sumB += self.bunchOfParticles.listOfParticles[k].GenerateMagneticField(affectedParticle)
             else:
                 pass
         return [sumE, sumB]
