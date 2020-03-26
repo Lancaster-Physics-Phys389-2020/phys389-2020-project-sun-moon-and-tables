@@ -8,13 +8,14 @@ class ElectricExternalFieldClass(AbstractExternalFieldClass):
     """
 
     def __init__(self, electricFieldStrength=np.array([0, 0, 0], dtype=float)
-    , angularFrequency=0.0
+    , angularFrequency=0.0, phaseShift=0.0
     , listOfDimensions = [[-1 * scipy.inf, scipy.inf] for i in range(3)]
     , name='Electric External Field'):
         super().__init__(fieldStrength=electricFieldStrength
         , angularFrequency=angularFrequency, name=name, listOfDimensions=listOfDimensions)
         self.fieldStrength = electricFieldStrength
         self.angularFrequency = angularFrequency
+        self.phaseShift = phaseShift
         self.name = name
         self.listOfDimensions = listOfDimensions
         

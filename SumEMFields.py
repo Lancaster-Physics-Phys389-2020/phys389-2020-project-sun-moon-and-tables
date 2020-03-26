@@ -28,12 +28,12 @@ class EMFieldClass(object):
         + self.listOfMagneticFields)
     
     def SumOfEMFields(self, affectedParticle:Particle, timeElapsed):
-        sumE = np.array([0, 0, 0], dtype=float)
-        sumB = np.array([0, 0, 0], dtype=float)
-        for i in range(len(self.listOfElectricFields)):
-            sumE += self.listOfElectricFields[i].GenerateField(timeElapsed, affectedParticle)
-        for j in range(len(self.listOfMagneticFields)):
-            sumB += self.listOfMagneticFields[j].GenerateField(timeElapsed, affectedParticle)
+        sumE = sum([self.listOfElectricFields[i].GenerateField(timeElapsed, affectedParticle) 
+        for i in range(len(self.listOfElectricFields))])
+
+        sumB = sum([self.listOfMagneticFields[i].GenerateField(timeElapsed, affectedParticle) 
+        for i in range(len(self.listOfMagneticFields))])
+        
         for k in range(len(self.bunchOfParticles.listOfParticles)):
             if affectedParticle != self.bunchOfParticles.listOfParticles[k]:
                 sumE += self.bunchOfParticles.listOfParticles[k].GenerateElectricField(affectedParticle)

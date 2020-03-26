@@ -8,19 +8,20 @@ class MagneticExternalFieldClass(AbstractExternalFieldClass):
     """
 
     def __init__(self, magneticFieldStrength=np.array([0, 0, 0], dtype=float)
-    , angularFrequency=0.0
+    , angularFrequency=0.0, phaseShift=0.0
     , listOfDimensions = [[-1 * scipy.inf, scipy.inf] for i in range(3)]
     , name='Magnetic External Field'):
         super().__init__(fieldStrength=magneticFieldStrength
         , angularFrequency=angularFrequency, name=name, listOfDimensions=listOfDimensions)
         self.fieldStrength = magneticFieldStrength
         self.angularFrequency = angularFrequency
+        self.phaseShift = phaseShift
         self.name = name
         self.listOfDimensions = listOfDimensions
         
     def __repr__(self):
-        return 'Field Name: {0}, Angular Frequency: {1}, Magnetic Field Strength: {2}\
-            Dimensions of the Magnetic Field: {3}'.format(self.name
+        return 'Field Name: {0}, Angular Frequency: {1}, Phase Shift (in Magnetic Field Strength: {3}\
+            Dimensions of the Magnetic Field: {4}'.format(self.name
             , self.angularFrequency, self.fieldStrength, self.listOfDimensions)
     
     def GenerateField(self, timeElapsed, affectedParticle):

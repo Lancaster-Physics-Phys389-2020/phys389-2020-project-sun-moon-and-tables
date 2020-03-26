@@ -41,8 +41,10 @@ class ParticleBunch(object):
        
     def CreateListOfParticles(self):
         listOfParticles = []
-        listOfRandomPositions = np.random.normal(loc=0.0, scale=1e-7
+        listOfRandomPositions = np.random.normal(loc=0.0, scale=1e-3
         , size=3*self.numberOfParticles)
+        # really strange, the list of random positions produces an error if the scale
+        # is greater than 1e-3, e.g 1e-2 or 1e-1 or 1...
         for i in range(self.numberOfParticles):
             listOfParticles.append(
                 Particle(position=np.array([listOfRandomPositions[3*i]
