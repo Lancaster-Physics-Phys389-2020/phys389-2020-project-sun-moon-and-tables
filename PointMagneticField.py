@@ -16,7 +16,7 @@ class PointMagneticFieldClass(AbstractPointFieldClass):
         return 'Magnetic Point Field: {0}, Source Particle of Magnetic Field: {1}'.format(
             self.name, self.sourceParticle)
     
-    def generateField(self, affectedParticle):
+    def GenerateField(self, affectedParticle):
         displacement = affectedParticle.position - self.sourceParticle.position
         distance = np.linalg.norm(displacement)
         return (const.mu_0 / (4 * np.pi)
