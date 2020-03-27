@@ -34,7 +34,7 @@ class SimulationStandardClass(AbstractSimulationClass):
             # and it really seems to work.
             self.simulationState.append(deepcopy(self.particleBunch.listOfParticles))
             self.simulationEnergy.append(deepcopy(self.particleBunch.bunchMeanEnergy))
-            self.simulationSpread.append(deepcopy(self.particleBunch.bunchSpread))
+            self.simulationSpread.append(deepcopy(self.particleBunch.bunchEnergySpread))
             self.simulationTime.append(deepcopy(timeElapsed)) 
             # deepcopy is required to make sure that the "append problem" 
             # is not realised

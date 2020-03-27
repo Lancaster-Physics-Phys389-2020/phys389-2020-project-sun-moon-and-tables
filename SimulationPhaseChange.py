@@ -72,9 +72,10 @@ class SimulationPhaseChangeClass(AbstractSimulationClass):
                     self.particleBunch.listOfParticles[i].Update(timestep)
                 timeElapsed += timestep
 
-            self.simulationFinalSpread.append(deepcopy(self.particleBunch.bunchSpread))
+            self.simulationFinalSpread.append(deepcopy(self.particleBunch.bunchEnergySpread))
             self.simulationPhaseShift.append(deepcopy(self.listOfPhaseChangingFields[0].phaseShift))
             self.particleBunch.listOfParticles = deepcopy(initialListOfParticles)
+            print(j)
             # this restores the state of the particles in the simulation to their initial state
             # this is not needed for the fields as they are simply queried at the timeElapsed
         self.simulationFinalSpread.append(self.simulationFinalSpread[0])

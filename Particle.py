@@ -47,10 +47,11 @@ class Particle:
     def LorentzFactor(self):
         return 1 / abs( 1 - np.linalg.norm(Particle.BetaVector(self))
          * np.linalg.norm(Particle.BetaVector(self)) ** 0.5)
-    # note, by not using math.sqrt, if we end up with beta^2 > 1, this function
-    # will not throw an error. We seem to be very close to staying under c,
-    # . . . And that seems to have fixed it!
-    def RelativisticMass(self):
+        # note, by not using math.sqrt, if we end up with beta^2 > 1, this function
+        # will not throw an error. We seem to be very close to staying under c,
+        # . . . And that seems to have fixed it!
+        
+    def RelativisticMassVector(self):
         return Particle.LorentzFactor(self) * self.restMass
 
     def Momentum(self):

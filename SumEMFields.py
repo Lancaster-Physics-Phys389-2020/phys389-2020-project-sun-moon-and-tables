@@ -44,8 +44,6 @@ class EMFieldClass(object):
         
     def GiveAcceleration(self, particleBunch:ParticleBunch, timeElapsed):
         for i in particleBunch.listOfParticles:
-            i.acceleration = ((i.charge * EMFieldClass.SumOfEMFields(self, i, timeElapsed)[0]
+            i.acceleration = (np.divide((i.charge * EMFieldClass.SumOfEMFields(self, i, timeElapsed)[0]
             + i.charge * np.cross(i.velocity, EMFieldClass.SumOfEMFields(self, i, timeElapsed)[1]))
-            / i.RelativisticMass())
-
-
+            , i.RelativisticMassVector()))

@@ -14,26 +14,27 @@ class ParticleBunch(object):
     So maybe this is a class where class methods could be used? Not totally sure.
     """
 
-    def __init__(self, numberOfParticles:int=0, bunchSpread=0.0
-    , bunchMeanEnergy=0.0, restMassOfBunch=1.0, chargeOfBunch=const.elementary_charge
+    def __init__(self, numberOfParticles:int=1, bunchPositionSpread=1.0, bunchEnergySpread=0.0
+    , bunchMeanEnergy=0.0, restMassOfBunch=const.proton_mass, chargeOfBunch=const.elementary_charge
     , name='Bunch Name'):
         self.numberOfParticles = numberOfParticles
-        self.bunchSpread = bunchSpread
+        self.bunchEnergySpread = bunchEnergySpread
         self.bunchMeanEnergy = bunchMeanEnergy
         self.name = name
         self.restMassOfBunch = restMassOfBunch
         self.chargeOfBunch = chargeOfBunch
+        self.bunchPositionSpread = bunchPositionSpread
 
         self.CreateListOfParticles()
 
     def __repr__(self):
         return 'Name of Particle in bunch: {0}, Bunch of Particles: {1}, Spread of Bunch: {2} \
         , Mean Energy of Bunch: {3}'.format(
-        self.name, self.listOfParticles, self.bunchSpread, self.bunchMeanEnergy)
+        self.name, self.listOfParticles, self.bunchEnergySpread, self.bunchMeanEnergy)
     
     def CreateVelocitySpread(self):
         listOfRandomEnergies = np.random.normal(loc=self.bunchMeanEnergy
-        , scale=self.bunchSpread, size=self.numberOfParticles)
+        , scale=self.bunchEnergySpread, size=self.numberOfParticles)
         listOfRandomVelocities = [math.sqrt(const.speed_of_light ** 2 
         - (self.restMassOfBunch ** 2 * const.speed_of_light ** 6) 
         / listOfRandomEnergies[i] ** 2) for i in range(self.numberOfParticles)]
@@ -41,7 +42,7 @@ class ParticleBunch(object):
        
     def CreateListOfParticles(self):
         listOfParticles = []
-        listOfRandomPositions = np.random.normal(loc=0.0, scale=1
+        listOfRandomPositions = np.random.normal(loc=0.0, scale=self.bunchPositionSpread
         , size=3*self.numberOfParticles)
         # really strange, the list of random positions produces an error if the scale
         # is greater than 1e-3, e.g 1e-2 or 1e-1 or 1...
@@ -70,7 +71,7 @@ class ParticleBunch(object):
         spreadArray = np.array([])
         for i in range(len(self.listOfParticles)):
             spreadArray = np.append(spreadArray, self.listOfParticles[i].TotalEnergy())
-        self.bunchSpread = np.std(spreadArray)
+        self.bunchEnergySpread = np.std(spreadArray)
 
     def FindBunchMeanVelocity(self):
         totalVelocity = 0.0
