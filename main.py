@@ -2,101 +2,119 @@ from ElectricExternalField import ElectricExternalFieldClass
 from MagneticExternalField import MagneticExternalFieldClass
 from ParticleBunchClass import ParticleBunch, Particle
 from SumEMFields import EMFieldClass
+from Plotting import PlottingClass
+from SimulationPhaseChange import SimulationPhaseChangeClass
+from SimulationStandard import SimulationStandardClass
 
 import scipy.constants as const
+import scipy
 import numpy as np
 import time
-import pandas as pd
-import matplotlib as mpl
-import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
-from copy import deepcopy 
 
-firstEField = ElectricExternalFieldClass(electricFieldStrength=np.array([0, 1e-1, 0])
-, angularFrequency=0.0, name='First Time Varying Electric Field')
 
-firstBField = MagneticExternalFieldClass(magneticFieldStrength=np.array([1e-5, 0, 0])
-, angularFrequency=0.0, name='First Time Varying Magnetic Field')
+firstAcceleratingEField = ElectricExternalFieldClass(electricFieldStrength=np.array([1e5, 0, 0])
+, listOfDimensions=[[-0.5, 0.5], [-1 * scipy.inf, scipy.inf], [-1 * scipy.inf, scipy.inf]]
+, angularFrequency=1e-6 * const.elementary_charge / const.proton_mass
+, phaseShift=0.0, name='Accelerating time-varying electric field')
+# phase shift is in units of 2pi by the way. 
 
-firstParticle = Particle(position=np.array([0, 0, 1e-10])
-, velocity=np.array([1, 10, 0]), acceleration=np.array([0, 0, 0])
-, name='Proton1', restMass=const.proton_mass, charge=1 * const.elementary_charge)
+constrainingEField1 = ElectricExternalFieldClass(electricFieldStrength=np.array([0, 1e-2, 0])
+, listOfDimensions=[[-1 * scipy.inf, scipy.inf], [-1*scipy.inf, -0.5], [-1 * scipy.inf, scipy.inf]]
+, name='Constraining electric field 1')
 
-secondParticle = Particle(position=np.array([0, 0, 0])
-, velocity=np.array([1, 10, 0]), acceleration=np.array([0, 0, 0])
-, name='Proton2', restMass=const.proton_mass, charge=1 * const.elementary_charge)
+constrainingEField2 = ElectricExternalFieldClass(electricFieldStrength=np.array([0, -1e-2, 0])
+, listOfDimensions=[[-1 * scipy.inf, scipy.inf], [0.5, scipy.inf], [-1 * scipy.inf, scipy.inf]]
+, name='Constraining electric field 2')
+# note if you don't specify dimensions, it automatically assumes that it is a field
+# across all space.
+#in addition, if you don't specify angular frequency (or phase shift) ie, the field doesn't
+# change in time, it assumes a frequency of zero and hence no changing field.
+firstBField = MagneticExternalFieldClass(magneticFieldStrength=np.array([0, 1e-6, 0])
+, name='First Time Varying Magnetic Field')
 
-firstParticleBunch = ParticleBunch([firstParticle, secondParticle], 0, 0, 'First Bunch')
+firstParticleBunch = ParticleBunch(numberOfParticles=4, bunchEnergySpread=1e-22, bunchPositionSpread=1e-3
+, bunchMeanEnergy=1.5032775929044686e-10, restMassOfBunch=const.proton_mass, chargeOfBunch=const.elementary_charge
+, name='Proton')
+# 1.503277592896106e-10 J of energy to initialise the protons with a mean velocity of 10 m/s good spread 5e-26
+# 1.5032775928961888e-10 J for 100m/s good spread is 1e-24 (?)
+# 1.5032775929044686e-10 J for 1000m/s good spread is 1e-22
+
+secondParticleBunch = ParticleBunch(numberOfParticles=1, bunchEnergySpread=1e-20, bunchPositionSpread=1e-5
+, bunchMeanEnergy=3.5356655116389166e-08, restMassOfBunch=92*const.proton_mass+143*const.neutron_mass
+, chargeOfBunch=92* const.elementary_charge, name='Uranium')
+# 3.5356655116389166e-08 J of energy to initialise uranium atoms with 1000m/s
+
+thirdParticleBunch = ParticleBunch(numberOfParticles=3, bunchEnergySpread=1e-25, bunchPositionSpread=1e-4
+, bunchMeanEnergy=8.187105649695575e-14, restMassOfBunch=const.electron_mass
+, chargeOfBunch=-1 *const.elementary_charge, name='Electron')
 
 collectionBField = [firstBField]
 
-collectionEField = [firstEField]
+acceleratingEFields = [firstAcceleratingEField]
+confiningEFields = []
 
 totalEMField = EMFieldClass(bunchOfParticles=firstParticleBunch
-, listOfElectricFields=collectionEField, listOfMagneticFields=collectionBField
+, listOfElectricFields=acceleratingEFields+confiningEFields, listOfMagneticFields=collectionBField
 , name='First Total EM Field')
 
-simulationState = []
-simulationTime = []
-timestep = 1e-1 # if the timestep gets too high, the system seems to jump over the restrictions of special relativity.
-# in addition, as the fields become more strong, the timestep needs to be smaller as to ensure special relativity is upheld.
+firstSimulation = SimulationStandardClass(totalEMField=totalEMField
+, particleBunch=firstParticleBunch, duration=0.2, largeTimestep=1e-3, smallTimestep=1e-6)
 
-def ApplyFieldSomeSeconds(duration):
-    timeElapsed = 0.0
-    
-    while timeElapsed < duration:
-        timestep = 1e-4
-        simulationState.append(deepcopy(firstParticleBunch.listOfParticles)) 
-        #print(firstParticleBunch.listOfParticles)
-        #print(timestep)
-        # ask Bertram / Ryan / stack overflow for why
-        simulationTime.append(deepcopy(timeElapsed)) 
-        # deepcopy is required to make sure that the "append problem" 
-        # is not realised
-        totalEMField.GiveAcceleration(firstParticleBunch, timeElapsed)
-        for i in range(len(firstParticleBunch.listOfParticles)):
-            firstParticleBunch.listOfParticles[i].Update(timestep)
-        timeElapsed += timestep
-    
+secondSimulation = SimulationPhaseChangeClass(listOfPhaseChangingFields=acceleratingEFields
+, phaseResolution=12, totalEMField=totalEMField, particleBunch=firstParticleBunch
+, duration=0.5, largeTimestep=5e-4, smallTimestep= 1e-6)
 
-def SaveSimulation(simulationState, simulationTime, fileName:str):
-    dictionary = {'Time':simulationTime, 'Simulation':simulationState}
-    dataFrame = pd.DataFrame(dictionary)
-    dataFrame.to_pickle("%s.pkl"%(fileName))
 
-def LoadSimulation(pickledFile:str): 
-    # this seems to be an inefficient method of loading the simulation
-    # method suggested by Tom is futher down, where fileName is defined.
-    return pd.read_pickle("%s.pkl"%(pickledFile))
+"""
+"""
+phaseChangeParticleBunch = ParticleBunch(numberOfParticles=4, bunchEnergySpread=1e-22, bunchPositionSpread=1e-3
+, bunchMeanEnergy=1.5032775929044686e-10, restMassOfBunch=const.proton_mass, chargeOfBunch=const.elementary_charge
+, name='Proton')
 
-def ThreeDPositionPlot(pickledFile:str,figureTitle:str, listOfAxisTitles:list):
-    numberOfParticles = len(LoadSim.Simulation[0])
-    lengthOfSimulation = len(LoadSim.Time)
-    inputData = [[[], [], []] for i in range(numberOfParticles)]
-    # creates a list per particle.
-    for i in range(lengthOfSimulation):
-        for j in range(numberOfParticles):
-                inputData[j][0].append(LoadSim.Simulation[i][j].position[0])
-                inputData[j][1].append(LoadSim.Simulation[i][j].position[1])
-                inputData[j][2].append(LoadSim.Simulation[i][j].position[2])
-    fig = plt.figure()
-    ax = fig.gca(projection='3d')
-    for j in range(numberOfParticles):
-        ax.plot(inputData[j][0], inputData[j][1], inputData[j][2]
-        , label='%s'%(LoadSim.Simulation[0][j].name))
-    ax.set_xlabel(listOfAxisTitles[0])
-    ax.set_ylabel(listOfAxisTitles[1])
-    ax.set_zlabel(listOfAxisTitles[2])
+phaseChangeEField = ElectricExternalFieldClass(electricFieldStrength=np.array([1e5, 0, 0])
+, listOfDimensions=[[-0.5, 0.5], [-1 * scipy.inf, scipy.inf], [-1 * scipy.inf, scipy.inf]]
+, angularFrequency=1e-6 * const.elementary_charge / const.proton_mass
+, phaseShift=0.0, name='Phase change time-varying electric field')
 
-    ax.legend()
-    plt.show()
+phaseChangeBField = MagneticExternalFieldClass(magneticFieldStrength=np.array([0, 1e-6, 0])
+, name='Phase change constant magnetic field')
+
+phaseChangeEMField = EMFieldClass(bunchOfParticles=phaseChangeParticleBunch
+, listOfElectricFields=[phaseChangeEField], listOfMagneticFields=[phaseChangeBField]
+, name='Phase change EM field')
+
+phaseChangeSimulation = SimulationPhaseChangeClass(listOfPhaseChangingFields=[phaseChangeEField]
+, phaseResolution=12, totalEMField=phaseChangeEMField, particleBunch=phaseChangeParticleBunch
+, duration=0.5, largeTimestep=5e-4, smallTimestep= 1e-6)
+
+
+fileNamePhaseChange = "file name of phase change simulation"
+phaseChangeSimulation.RunSimulation()
+phaseChangeSimulation.SaveSimulation(fileNamePhaseChange)
+plotSimulationPhaseChange3 = PlottingClass(fileNamePhaseChange)
+plotSimulationPhaseChange3.RadialPhaseChangePlot()
+plotSimulationPhaseChange3.PhaseChangePlot()
+
+"""
+"""
+
+fileName1 = "file name of simulation 1"
+fileName2 = "file name of simulation 2"
 
 start = time.time()
-ApplyFieldSomeSeconds(1e-1) # WARNING, A LONG SIMULATION SEEMS TO STOP THE PLOTTING FROM WORKING!
+"""
+firstSimulation.RunSimulation()
+firstSimulation.SaveSimulation(fileName1)
 end = time.time()
 print("Time to simulate is", end - start, "seconds")
-fileName = "fuckMe"
-SaveSimulation(simulationState, simulationTime, fileName)
-# this is currently the only way that I have my loading working.
-LoadSim = pd.read_pickle("%s.pkl"%(fileName))
-ThreeDPositionPlot(fileName, "Figure Title", ["x position (m)", "y position (m)", "z position (m)"])
+plotSimulation1 = PlottingClass(fileName1)
+plotSimulation1.ThreeDPositionPlot()
+plotSimulation1.FirstParticleVelocityPlot()
+"""
+"""
+secondSimulation.RunSimulation()
+secondSimulation.SaveSimulation(fileName2)
+plotSimulation2 = PlottingClass(fileName2)
+plotSimulation2.RadialPhaseChangePlot()
+plotSimulation2.PhaseChangePlot()
+"""

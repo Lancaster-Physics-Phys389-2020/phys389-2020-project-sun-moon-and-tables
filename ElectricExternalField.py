@@ -1,6 +1,4 @@
-import numpy as np
-from AbstractExternalField import AbstractExternalFieldClass
-import math
+from AbstractExternalField import AbstractExternalFieldClass, scipy, np, math
 
 class ElectricExternalFieldClass(AbstractExternalFieldClass):
     """ This class will generate an external electric field that can vary
@@ -10,16 +8,17 @@ class ElectricExternalFieldClass(AbstractExternalFieldClass):
     """
 
     def __init__(self, electricFieldStrength=np.array([0, 0, 0], dtype=float)
-    , angularFrequency=0.0, name='Electric External Field'):
-        super().__init__(fieldStrength=electricFieldStrength
-        , angularFrequency=angularFrequency, name=name)
+    , angularFrequency=0.0, phaseShift=0.0
+    , listOfDimensions = [[-1 * scipy.inf, scipy.inf] for i in range(3)]
+    , name='Electric External Field'):
+        super().__init__(fieldStrength=electricFieldStrength, phaseShift=phaseShift
+        , angularFrequency=angularFrequency, name=name, listOfDimensions=listOfDimensions)
         self.fieldStrength = electricFieldStrength
-        self.angularFrequency = angularFrequency
-        self.name = name
         
     def __repr__(self):
-        return 'Field Name: {0}, Angular Frequency: {1}, Electric Field Strength: {2}'.format(
-        self.name, self.angularFrequency, self.fieldStrength)
+        return 'External Electric Field: {0}, Angular Frequency: {1}, Phase Shift: {2}\
+        , Electric Field Strength: {3}, Dimensions of the Electric Field: {4}'.format(
+        self.name, self.angularFrequency, self.phaseShift, self.fieldStrength, self.listOfDimensions)
     
-    def generateField(self, timeElapsed):
-        return super().generateField(timeElapsed)
+    def GenerateField(self, timeElapsed, affectedParticle):
+        return super().GenerateField(timeElapsed, affectedParticle)
