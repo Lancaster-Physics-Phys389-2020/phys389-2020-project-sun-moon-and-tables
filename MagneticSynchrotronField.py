@@ -38,7 +38,7 @@ class MagneticSynchrotronFieldClass(AbstractExternalFieldClass):
         self.fieldStrength = magneticFieldStrength
         self.particleBunch = particleBunch
         self.initialBField = np.linalg.norm(self.fieldStrength)
-        self.radius = (np.linalg.norm(self.particleBunch.FindBunchMeanMomentum())
+        self.radius = (np.linalg.norm(self.particleBunch.FindBunchMeanVelocity()) * self.particleBunch.restMassOfBunch 
         / (self.initialBField * self.particleBunch.chargeOfBunch))
         
     def __repr__(self):
@@ -58,7 +58,7 @@ class MagneticSynchrotronFieldClass(AbstractExternalFieldClass):
                 multiplierOfBField (float): Value that the magnetic field must be multiplied by
                     in order to keep the bunch in a fixed radius circular path
         """
-        multiplierOfBField = (np.linalg.norm(self.particleBunch.FindBunchMeanMomentum()) 
+        multiplierOfBField = (np.linalg.norm(self.particleBunch.FindBunchMeanVelocity()) * self.particleBunch.restMassOfBunch
         / (self.radius * self.particleBunch.chargeOfBunch * self.initialBField))
         return multiplierOfBField
 

@@ -73,31 +73,19 @@ synchrotronBField0 = MagneticSynchrotronFieldClass(magneticFieldStrength=np.arra
 synchrotronRadius = (np.linalg.norm(synchrotronParticleBunch.FindBunchMeanMomentum())
 / (np.linalg.norm(synchrotronBField0.fieldStrength) * synchrotronParticleBunch.chargeOfBunch))
 
-print(synchrotronRadius)
-
-listOfMagneticFieldLocations = [[(synchrotronRadius / math.cos(math.pi/8))*math.cos((2*i*math.pi/8)+math.pi/8)
-, (synchrotronRadius / math.cos(math.pi/8))*math.sin((2*i*math.pi/8)+math.pi/8)+(synchrotronRadius / math.cos(math.pi/8))] for i in range(8)]
-
-synchrotronBField1 = MagneticSynchrotronFieldClass(magneticFieldStrength=np.array([0, 5e-8, 0])
-, name='synchotronBField1', particleBunch=synchrotronParticleBunch, listOfDimensions=
-[[100 - 10, 100 + 10], [-1*scipy.inf, scipy.inf], [- 10, 10]])
-
 synchrotronEField1 = ElectricExternalFieldClass(electricFieldStrength=np.array([12e3, 0, 0])
 , listOfDimensions=[[-1, 1], [-1 * scipy.inf, scipy.inf], [-1, 1]], name='synchrotronEField1')
-
-synchrotronRadius = (np.linalg.norm(synchrotronParticleBunch.FindBunchMeanMomentum())
-/ (np.linalg.norm(synchrotronBField1.fieldStrength) * synchrotronParticleBunch.chargeOfBunch))
 
 synchrotronEField2 = ElectricExternalFieldClass(electricFieldStrength=np.array([-12e3, 0, 0])
 , listOfDimensions=[[-1, 1], [-1 * scipy.inf, scipy.inf], [2 * synchrotronRadius - 1, 2 * synchrotronRadius + 1]]
 , name='synchrotronEField2')
 
 synchrotronEMField = EMFieldClass(bunchOfParticles=synchrotronParticleBunch
-, listOfElectricFields=[synchrotronEField1, synchrotronEField2], listOfMagneticFields=[synchrotronBField1]
+, listOfElectricFields=[synchrotronEField1, synchrotronEField2], listOfMagneticFields=[synchrotronBField0]
 , name='synchrotronEMField')
 
 synchrotronSimulation = SimulationStandardClass(totalEMField=synchrotronEMField
-, particleBunch=synchrotronParticleBunch, duration=0.005, largeTimestep=1e-7, smallTimestep=1e-8)
+, particleBunch=synchrotronParticleBunch, duration=0.5, largeTimestep=1e-7, smallTimestep=5e-8)
 
 start = time.time()
 synchrotronSimulation.RunSimulation()
