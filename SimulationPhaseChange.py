@@ -2,49 +2,76 @@ from AbstractSimulation import AbstractSimulationClass, np, pd, deepcopy, stats
 from SumEMFields import EMFieldClass
 from ElectricExternalField import ElectricExternalFieldClass
 from ParticleBunchClass import ParticleBunch
-# this also allows us to import all the modules used, which is helpful.
-
-# okay, so we want a file for runSimulation. 
-# that has separate saving methods and things like that.
-# so it makes sense to have them as separate classes.
-# this file is to serve as the "main.py" equivalent for running the 
-# changing phase simulation, where we run the simulation with
-# a different accelerating field with different phases.
-# the main.py file will actually contain the defining of the different
-# bunches of particles etc.
-# but this will contain all the methods for running the changing phase simulation
-# and the specific saving required for that.
-# bear in mind, you may need to think about how the data is saved and loaded
-# for the plots in the PlottingClass.
 
 class SimulationPhaseChangeClass(AbstractSimulationClass):
-    """ This class is responsible for containing methods that create
-    a simulation that allows the comparison of different phase shifts 
-    in external accelerating electric fields in order to find the phase shift
-    that reduces bunch energy spread the most.
+    """ Class that compares the result of altering the phase of accelerating electric fields in a cyclotron.
+
+        Class Attributes:
+            listOfPhaseChangingFields (list): List of fields that will have their phase changed across
+                different simulations. Members of list should be a subset of the totalEMField attribute.
+            phaseResolution (int): Number of segements that the total phase shift that can be applied to a
+                sinusoidal function (2*pi) will be split into.
+            simulationFinalSpread (list): List of the final standard deviation in the energy of particles
+                in the simulation at the end of each simulation.
+            simulationPhaseShift (list): List of the phase shift applied in each simulation.
+            totalEMField (object: EMFieldClass): The combined collection of electromagnetic
+                fields that interact in the simulation.
+            particleBunch (object: ParticleBunch): The bunch of particles that are moved
+                throughout the simulation
+            duration (float): Duration of each simulation
+            largeTimeStep (float): The timestep that is used when on average, the bunch is
+                outside of the accelerating electric field
+            smallTimeStep (float): The shorter timestep that is used when on average, the
+                bunch is inside of the accelerating electric field.
     """
+
     def __init__(self, listOfPhaseChangingFields=[ElectricExternalFieldClass], phaseResolution=50
     , totalEMField=EMFieldClass, particleBunch=ParticleBunch, duration=0.1, largeTimestep=1e-3
     , smallTimestep=1e-8):
+        """ Constructor for the SimulationPhaseChangeClass class.
+                Inherits the __init__ from AbstractSimulationClass.
+            
+            Args:
+                listOfPhaseChangingFields (list): List of fields that will have their phase changed across
+                    different simulations. Members of list should be a subset of the totalEMField attribute.
+                phaseResolution (int): Number of segements that the total phase shift that can be applied to a
+                    sinusoidal function (2*pi) will be split into.
+                totalEMField (object: EMFieldClass): The combined collection of electromagnetic
+                    fields that interact in the simulation.
+                particleBunch (object: ParticleBunch): The bunch of particles that are moved
+                    throughout the simulation
+                duration (float): Duration of each simulation
+                largeTimeStep (float): The timestep that is used when on average, the bunch is
+                    outside of the accelerating electric field
+                smallTimeStep (float): The shorter timestep that is used when on average, the
+                    bunch is inside of the accelerating electric field.
+        """
         super().__init__(totalEMField=totalEMField, particleBunch=particleBunch, duration=duration
         , largeTimestep=largeTimestep, smallTimestep=smallTimestep)
         self.listOfPhaseChangingFields = listOfPhaseChangingFields
         self.phaseResolution = phaseResolution
-        self.simulationFinalSpread = [] # our y axis data
-        self.simulationPhaseShift = [] # our x axis data
+        self.simulationFinalSpread = [] # y axis data
+        self.simulationPhaseShift = [] # x axis data
 
     def RunSimulation(self):
-        """This method runs the simulation. As it is an abstract
-        method, it is required in order for this class to operate.
+        """Method that runs the series of simulations that determine the impact of altering phase shift.
+
+            Paramaters:
+                initialListOfParticles (list): Deepcopy of the initial conditions of the first simulation,
+                    so that these can be re-created for following simulations.
+                timeElapsed (float): Time that has elapsed in the current simulation
+                timeStep (float): Either refers to smallTimeStep or largeTimeStep depending on the mean
+                    x position of particles in the simulation.
+                acceleratingFieldDimensions (list): Dimensions of the first phase changing field.
         """
         self.simulationFinalSpread = [] # our y axis data
         self.simulationPhaseShift = [] # our x axis data
-        initialListOfParticles = deepcopy(self.particleBunch.listOfParticles) 
         #creates a copy of the initial state of the system
-        
-        for j in range(self.phaseResolution): #central for loop for the simulations.
-            # each time this is run, a new simulation is run. the final energy spread for 
-            # that simulation is then saved.
+        initialListOfParticles = deepcopy(self.particleBunch.listOfParticles) 
+        for j in range(self.phaseResolution): 
+            #central for loop for the simulations.
+            # each time this is iterated, a new simulation is run. the final energy spread
+            #  for that simulation is then saved.
             SimulationPhaseChangeClass.CreatePhaseShiftedFields(self, j)
 
             timeElapsed = 0.0
@@ -54,39 +81,55 @@ class SimulationPhaseChangeClass(AbstractSimulationClass):
                 meanXPosition = stats.mean([self.particleBunch.listOfParticles[i].position[0] 
                 for i in range(self.particleBunch.numberOfParticles)])
                 acceleratingFieldDimensions = self.listOfPhaseChangingFields[0].listOfDimensions[0]
+                # It is assumed that the acceleratingFieldDimensions is similar to the dimensions 
+                # of other accelerating electric fields.
+                # If these dimensions differ greatly, the time-steps of the simulation will not be
+                # adjusted accurately.
                 if (meanXPosition < acceleratingFieldDimensions[1] and 
                 meanXPosition > acceleratingFieldDimensions[0]):
                     timestep = self.smallTimestep
-                # deepcopy is required to make sure that the "append problem" 
-                # is not realised
+                    # if the particles are inside of the accelerating field, the simulation runs slower
                 self.totalEMField.GiveAcceleration(self.particleBunch, timeElapsed)
                 self.particleBunch.UpdateBunchMeanEnergy(), self.particleBunch.UpdateBunchEnergySpread()
                 for i in range(len(self.particleBunch.listOfParticles)):
-                    self.particleBunch.listOfParticles[i].Update(timestep)
+                    self.particleBunch.listOfParticles[i].UpdateCromer(timestep)
                 timeElapsed += timestep
 
             self.simulationFinalSpread.append(deepcopy(self.particleBunch.bunchEnergySpread))
-            print(self.particleBunch.bunchEnergySpread)
             self.simulationPhaseShift.append(deepcopy(self.listOfPhaseChangingFields[0].phaseShift))
             self.particleBunch.listOfParticles = deepcopy(initialListOfParticles)
+            # at the end of each simulation, the initial particle state is restored
             print(j+1, "simulations completed")
-            # this restores the state of the particles in the simulation to their initial state
-            # this is not needed for the fields as they are simply queried at the timeElapsed
         self.simulationFinalSpread.append(deepcopy(self.simulationFinalSpread[0]))
         self.simulationPhaseShift.append(deepcopy(self.simulationPhaseShift[0]+1.0))
-        # at the end of the simulation, the first value is stuck to the end, to ensure the graph forms a complete circle
+        # at the end of all the simulations, the first value is stuck to the end.
+        #  This ensures the radial graph forms a complete circle
 
     def CreatePhaseShiftedFields(self, iterationOfSimulation:int):
-        """Method changes the phase of the fields. Requires that IdentifyChangingFields
-        has run first, to ensure that the items in self.listOfChangingFields are now pointing
-        at the correct fields within the totalEMField class.
-        Last field generated is one period ahead of the start.
+        """ Method to shift the phase of fields in listOfPhaseChangingFields
+
+            Args:
+                iterationOfSimulation (int): The number of simulations that have been completed
+            
+            Parameters:
+                inverseOfSimulation (float): Inverse of the number of simulations that will be run, which
+                    determines what fraction the phase will be shifted in each iteration
         """
         inverseOfResolution = 1 / self.phaseResolution
         for i in self.listOfPhaseChangingFields:
             i.phaseShift = np.round(inverseOfResolution + inverseOfResolution * iterationOfSimulation, decimals = 5)
     
     def SaveSimulation(self, fileName):
+        """ Method to save the simulation data to a .pkl file as a pandas dataframe
+
+            Args:
+                fileName (string): Name of the saved data file
+            
+            Parameters:
+                dictionary (dictionary): Dictionary that contains phase shift data and the final standard deviation
+                    of energies of particles in each simulation
+                dataFrame (pandas dataframe): Dataframe of dictionary
+        """
         dictionary = {'Phase':self.simulationPhaseShift, 'FinalSpread':self.simulationFinalSpread}
         dataFrame = pd.DataFrame(dictionary)
         dataFrame.to_pickle("%s.pkl"%(fileName))

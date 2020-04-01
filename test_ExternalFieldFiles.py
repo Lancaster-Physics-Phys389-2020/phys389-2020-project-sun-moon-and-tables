@@ -22,10 +22,12 @@ velocity=np.array([1e6, 1.5e6, 2e6]), acceleration=np.array([2.5e3, 3e3, 3.5e3])
 , name='test_Particle', restMass=3.0, charge=7.0)
 
 def test_GenericField__repr__():
-    assert re.findall("Field: test_Generic Field", test_GenericField.__repr__()) == ["Field: test_Generic Field"]
+    assert re.findall(
+        "Field: test_Generic Field", test_GenericField.__repr__()) == ["Field: test_Generic Field"]
 
 def test_ExternalElectricField__repr__():
-    assert re.findall("External Electric Field: test_Electric Field", test_ElectricExternalField.__repr__()) == ["External Electric Field: test_Electric Field"]
+    assert re.findall(
+        "External Electric Field: test_Electric Field", test_ElectricExternalField.__repr__()) == ["External Electric Field: test_Electric Field"]
 
 def test_GenerateElectricField():
     fieldArray = test_ElectricExternalField.GenerateField(timeElapsed=1.0, affectedParticle=test_Particle)
@@ -36,7 +38,8 @@ def test_ElectricIsParticleInField():
     assert [truthArray[i] for i in range(3)] == [1.0, 1.0, 0.0]
 
 def test_ExternalMagneticField__repr__():
-    assert re.findall("External Magnetic Field: test_Magnetic Field", test_MagneticExternalField.__repr__()) == ["External Magnetic Field: test_Magnetic Field"]
+    assert re.findall(
+        "External Magnetic Field: test_Magnetic Field", test_MagneticExternalField.__repr__()) == ["External Magnetic Field: test_Magnetic Field"]
 
 def test_MagneticIsParticleInField():
     truthArray = MagneticExternalFieldClass.IsParticleInField(self=test_MagneticExternalField, affectedParticle=test_Particle)

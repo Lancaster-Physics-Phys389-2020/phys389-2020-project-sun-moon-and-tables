@@ -9,11 +9,35 @@ from ElectricExternalField import ElectricExternalFieldClass
 from ParticleBunchClass import ParticleBunch
 
 class AbstractSimulationClass(ABC):
-    """ This class will be the abstract class that will define 
-    the required methods for any Simulation class.
+    """ Abstract base class for building a simulation or set of simulations
+        
+        Class Attributes:
+            totalEMField (object: EMFieldClass): The combined collection of electromagnetic
+                fields that interact in the simulation.
+            particleBunch (object: ParticleBunch): The bunch of particles that are moved
+                throughout the simulation
+            duration (float): Duration of each simulation
+            largeTimeStep (float): The timestep that is used when on average, the bunch is
+                outside of the accelerating electric field
+            smallTimeStep (float): The shorter timestep that is used when on average, the
+                bunch is inside of the accelerating electric field.
+
     """
     def __init__(self, totalEMField=EMFieldClass, particleBunch=ParticleBunch, duration=1.0, largeTimestep=1e-3
     , smallTimestep=1e-8):
+        """ Constructor for any simulation child class.
+
+            Args:
+                totalEMField (object: EMFieldClass): The combined collection of electromagnetic
+                    fields that interact in the simulation.
+                particleBunch (object: ParticleBunch): The bunch of particles that are moved
+                    throughout the simulation
+                duration (float): Duration of each simulation
+                largeTimeStep (float): The timestep that is used when on average, the bunch is
+                    outside of the accelerating electric field
+                smallTimeStep (float): The shorter timestep that is used when on average, the
+                    bunch is inside of the accelerating electric field.
+        """
         self.totalEMField = totalEMField
         self.particleBunch = particleBunch
         self.duration = duration
@@ -22,16 +46,16 @@ class AbstractSimulationClass(ABC):
 
     @abstractmethod
     def RunSimulation(self):
-        """ This method will run the simulation. 
-        The method will be different for the different type of simulation
-        that is being run.
+        """ Abstract method for running the simulation or set of simulations.
+                Method is abstract as different simulations require very different
+                steps.  
         """
     
     @abstractmethod
     def SaveSimulation(self, fileName:str):
-        """ This method will save the simulation state.
-        This will be different as different simulations will require
-        different datasets to be saved.
+        """ Abstract method for saving data from the simulation or set of simulations.
+                Method is abtract since different simulations generate results in 
+                different formats.
         """
     
 

@@ -22,13 +22,17 @@ test_PointElectricField = PointElectricFieldClass(sourceParticle=test_Particle, 
 test_PointMagneticField = PointMagneticFieldClass(sourceParticle=test_Particle, name="test_Particle Magnetic Field")
 
 def test_PointElectricField__repr__():
-    assert re.findall("Electric Point Field: test_Particle Electric Field", test_PointElectricField.__repr__()) == ["Electric Point Field: test_Particle Electric Field"]
+    assert re.findall(
+        "Electric Point Field: test_Particle Electric Field", test_PointElectricField.__repr__()) == ["Electric Point Field: test_Particle Electric Field"]
 
 def test_GenerateElectricField():
-    assert test_PointElectricField.GenerateField(test_Particle2) == pytest.approx(np.array([-2.93527021e-20, -4.74535350e-19, -4.88233278e-18]), rel=0.06)
+    assert test_PointElectricField.GenerateField(test_Particle2) == pytest.approx(
+        np.array([-2.93527021e-20, -4.74535350e-19, -4.88233278e-18]), rel=0.06)
 
 def test_PointMagneticField__repr__():
-    assert re.findall("Magnetic Point Field: test_Particle Magnetic Field", test_PointMagneticField.__repr__()) == ["Magnetic Point Field: test_Particle Magnetic Field"]
+    assert re.findall(
+        "Magnetic Point Field: test_Particle Magnetic Field", test_PointMagneticField.__repr__()) == ["Magnetic Point Field: test_Particle Magnetic Field"]
 
 def test_GenerateMagneticField():
-    assert test_PointMagneticField.GenerateField(test_Particle2) == pytest.approx(np.array([-9.04695408e-07,  6.84596832e-07, -6.10999201e-08]), rel=0.06)
+    assert test_PointMagneticField.GenerateField(test_Particle2) == pytest.approx(
+        np.array([-9.04695408e-07,  6.84596832e-07, -6.10999201e-08]), rel=0.06)

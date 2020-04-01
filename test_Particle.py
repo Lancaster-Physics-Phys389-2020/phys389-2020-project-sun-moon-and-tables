@@ -35,7 +35,8 @@ def test_RelativisticMass():
 
 def test_Momentum():
     # checks momentum is calculated correctly
-    assert test_Particle.Momentum() == pytest.approx(np.array([3002555.72040411, 4503833.58060616, 6005111.44080822]))
+    assert test_Particle.Momentum() == pytest.approx(
+        np.array([3002555.72040411, 4503833.58060616, 6005111.44080822]))
 
 def test_TotalEnergy():
     # checks total energy is calculated correctly
@@ -45,22 +46,28 @@ def test_KineticEnergy():
     # checks kinetic energy is calculated correctly
     assert test_Particle.KineticEnergy() == pytest.approx(10893316812256.0)
 
-def test_Update():
-    test_Particle.Update(1.0)
+def test_UpdateCromer():
+    test_Particle.UpdateCromer(deltaT=1.0)
     # updates a particle with the euler cromer method and checks the position and acceleration is updated correctly
-    assert test_Particle.velocity == pytest.approx(np.array([1002500., 1503000., 2003500.]))
-    assert test_Particle.position == pytest.approx(np.array([1002510., 1503100., 2004500.]))
+    assert test_Particle.velocity == pytest.approx(
+        np.array([1002500., 1503000., 2003500.]))
+    assert test_Particle.position == pytest.approx(
+        np.array([1002510., 1503100., 2004500.]))
 
-def test_Update2():
-    test_Particle2.Update2(1.0)
+def test_UpdateForward():
+    test_Particle2.UpdateForward(deltaT=1.0)
     # updates a particle with the euler forward method and checks the position and acceleration is updated correctly
-    assert test_Particle2.position == pytest.approx(np.array([1000010., 1500100., 2001000.]))
-    assert test_Particle2.velocity == pytest.approx(np.array([1002500., 1503000., 2003500.]))
+    assert test_Particle2.position == pytest.approx(
+        np.array([1000010., 1500100., 2001000.]))
+    assert test_Particle2.velocity == pytest.approx(
+        np.array([1002500., 1503000., 2003500.]))
 
 def test_GenerateElectricField():
     # check that an electric field can be created by a particle and is the correct vector at a distance
-    assert test_Particle.electricField.GenerateField(test_Particle2) == pytest.approx(np.array([-8.55023151e-20, -1.02602778e-19, -1.19703241e-19]))
+    assert test_Particle.electricField.GenerateField(affectedParticle=test_Particle2) == pytest.approx(
+        np.array([-8.55023151e-20, -1.02602778e-19, -1.19703241e-19]))
 
 def test_GenerateMagneticField():
     # check that a magnetic field can be created by a particle and is the correct vector at a distance
-    assert test_Particle.magneticField.GenerateField(test_Particle2) == pytest.approx(np.array([3.64049352e-09, -7.28098705e-09,  3.64049352e-09]))
+    assert test_Particle.magneticField.GenerateField(affectedParticle=test_Particle2) == pytest.approx(
+        np.array([3.64049352e-09, -7.28098705e-09,  3.64049352e-09]))
