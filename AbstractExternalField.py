@@ -51,22 +51,22 @@ class AbstractExternalFieldClass(ABC, GenericFieldClass):
             affectedParticle (object: Particle): The particle being affected by the field
         
         Parameters:
-            isInFieldArray (numpy array): Truth array representing whether a particle is
+            isInFieldValue (float): Value representing whether a particle is
                 within the boundaries of the field
 
         Returns:
-            isInFieldArray (numpy array): Truth numpy array. 1.0 means the particle is within
+            isInFieldValue (float): 1.0 means the particle is within
                 boundaries in that dimension. 0.0 means the particle is outside of the field
                 boundaries in that dimension.
         """
-        isInFieldArray = np.array([1.0, 1.0, 1.0], dtype=float)
+        isInFieldValue = 1.0
         # self.listOfDimensions[i][0]: minimum limit, self.listOfDimensions[i][1]: maximum limit
         # if both conditions are true, no change is made to isInFieldArray[i]
         for i in range(3):
             if not (affectedParticle.position[i] > self.listOfDimensions[i][0]
             and affectedParticle.position[i] < self.listOfDimensions[i][1]):
-                isInFieldArray = np.array([0.0, 0.0, 0.0])
-        return isInFieldArray
+                isInFieldValue = 0.0
+        return isInFieldValue
            
     def GenerateField(self, timeElapsed, affectedParticle):
         """Calculates the magntiude of the field in 3D using a cosine function.

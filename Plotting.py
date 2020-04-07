@@ -59,7 +59,6 @@ class PlottingClass:
                 , label='%s'%(self.LoadSim.Simulation[0][j].name))
             plt.title("figureTitle")
             ax.set_xlabel("x position (m)"), ax.set_ylabel("y position (m)"), ax.set_zlabel("z position (m)")
-
             ax.legend()
             # plt.savefig("%s 3D position.jpg"%(self.fileName))
             plt.show()
@@ -112,14 +111,17 @@ class PlottingClass:
             AttributeError
             print("You cannot plot this figure with the data you have provided.")
 
-    def FirstParticleVelocityPlot(self):
-        """ Method to plot the velocity of the first particle in the simulation over time
+    def MeanParticleVelocityPlot(self):
+        """ Method to plot the mean velocity of particles in the simulation over time
 
             Parameters:
                 lengthOfSimulation (int): Number of timesteps that the simulation
                         ran for
-                inputData (list): List containing the norm of the velocity of the first
-                    particle in the simulation
+                numberOfParticles (int): Number of particles in the simulation
+                velocitySum (ndarray): Numpy array that contains the sum total of the
+                    velocity of particles in the simulation
+                inputData (list): List containing the norm of the mean velocity of
+                    particles in the simulation
 
             Exceptions:
                     Attribute Error: If pandas does not detect LoadSim.Time, an 
@@ -128,17 +130,19 @@ class PlottingClass:
         """
         try:
             lengthOfSimulation = len(self.LoadSim.Time)
+            numberOfParticles = len(self.LoadSim.Simulation[0])
             inputData = []
             for i in range(lengthOfSimulation):
-                inputData.append(np.linalg.norm(self.LoadSim.Simulation[i][0].velocity))
-                    
+                velocitySum = sum([self.LoadSim.Simulation[i][j].velocity for j in range(numberOfParticles)])
+                inputData.append(np.linalg.norm(velocitySum / numberOfParticles))
+
             fig = plt.figure()
             plt.plot(self.LoadSim.Time, inputData, label='Velocity Plot baby')
             plt.xlabel("Time (s)"), plt.ylabel("Velocity (ms$^{-1}$)")
             plt.title("figureTitle")
             
             plt.legend()
-            # plt.savefig("%s 1st particle velocity.jpg"%(self.fileName))
+            # plt.savefig("%s Mean particle velocity.jpg"%(self.fileName))
             plt.show()
         except:
             AttributeError
@@ -157,11 +161,9 @@ class PlottingClass:
         try:
             fig = plt.polar(self.LoadSim.Phase * 2 * math.pi, self.LoadSim.FinalSpread
             , label='Spread plot baby')
-            plt.xlabel("Phase Change as a Fraction of a Period (no units)")
-            plt.ylabel("Final Energy Spread Std. (J)")
             plt.title("figureTitle")
 
-            plt.legend()
+            plt.legend(loc=2)
             # plt.savefig("%s phase change final energy spread.jpg"%(self.fileName))
             plt.show()
         except:
@@ -187,11 +189,91 @@ class PlottingClass:
             plt.xlabel("Phase Change as a Fraction of a Period (no units)"), plt.ylabel("Final Energy Spread Std. (J)")
             plt.title("figureTitle")
             plt.yscale(yscale)
-            plt.legend()
+            plt.legend(loc=4)
             # plt.savefig("%s phase change final energy spread.jpg"%(self.fileName))
             plt.show()
         except:
             AttributeError
             print("You cannot plot this figure with the data you have provided.")
     
-        
+    def ConservationOfMomentumPlot(self):
+        """ Method to plot the norm of the total momentum of particles in the simulation over time
+
+            Exceptions:
+                    Attribute Error: If pandas does not detect LoadSim.Momentum, an 
+                        attribute error will be raised. This exception prevents the error
+                        from triggering and presents no plot.
+        """
+        try:
+            fig = plt.figure()
+            plt.plot(self.LoadSim.Time, self.LoadSim.Momentum, label='Momentum plot baby')
+            plt.xlabel("Time (s)"), plt.ylabel("Total Momentum of the Simulation (kgms$^{-1}$)")
+            plt.title("figureTitle")
+            plt.legend(loc=2)
+            # plt.savefig("%s total momentum of simulation over time.jpg"%(self.fileName))
+            plt.show()
+        except:
+            AttributeError
+            print("You cannot plot this figure with the data you have provided.")
+    
+    def ConservationOfEnergyFieldsPlot(self):
+        """ Method to plot the total energy from electromagnetic fields in the simulation 
+                over time
+
+            Exceptions:
+                    Attribute Error: If pandas does not detect LoadSim.EnergyFields, an 
+                        attribute error will be raised. This exception prevents the error
+                        from triggering and presents no plot.
+        """
+        try:
+            fig = plt.figure()
+            plt.plot(self.LoadSim.Time, self.LoadSim.EnergyFields, label='Fields plot baby')
+            plt.xlabel("Time (s)"), plt.ylabel("Total energy of fields in the simulation (J)")
+            plt.title("figureTitle")
+            plt.legend(loc=2)
+            # plt.savefig("%s total energy of simulation over time.jpg"%(self.fileName))
+            plt.show()
+        except:
+            AttributeError
+            print("You cannot plot this figure with the data you have provided.")
+    
+    def ConservationOfEnergyParticlesPlot(self):
+        """ Method to plot the total kinetic energy of particles in the simulation over time
+
+            Exceptions:
+                    Attribute Error: If pandas does not detect LoadSim.EnergyParticles, an 
+                        attribute error will be raised. This exception prevents the error
+                        from triggering and presents no plot.
+        """
+        try:
+            fig = plt.figure()
+            plt.plot(self.LoadSim.Time, self.LoadSim.EnergyParticles, label='Particle plot baby')
+            plt.xlabel("Time (s)"), plt.ylabel("Total kinetic energy of particles in the simulation (J)")
+            plt.title("figureTitle")
+            plt.legend(loc=2)
+            # plt.savefig("%s total energy of simulation over time.jpg"%(self.fileName))
+            plt.show()
+        except:
+            AttributeError
+            print("You cannot plot this figure with the data you have provided.")
+    
+    def ConservationOfAngMomentumPlot(self):
+        """ Method to plot the norm of the total angular momentum of particles in the simulation
+                over time
+
+            Exceptions:
+                    Attribute Error: If pandas does not detect LoadSim.AngularMomentum, an 
+                        attribute error will be raised. This exception prevents the error
+                        from triggering and presents no plot.
+        """
+        try:
+            fig = plt.figure()
+            plt.plot(self.LoadSim.Time, self.LoadSim.AngularMomentum, label='Ang Mom plot baby')
+            plt.xlabel("Time (s)"), plt.ylabel("Total angular momentum of the simulation (kgm$^{2}$s$^{-1}$)")
+            plt.title("figureTitle")
+            plt.legend(loc=2)
+            # plt.savefig("%s total angular momentum of simulation over time.jpg"%(self.fileName))
+            plt.show()
+        except:
+            AttributeError
+            print("You cannot plot this figure with the data you have provided.")

@@ -1,6 +1,7 @@
 import numpy as np 
 import math
 import scipy.constants as const
+import multiprocessing
 from PointElectricField import PointElectricFieldClass
 from PointMagneticField import PointMagneticFieldClass
 from ElectricExternalField import ElectricExternalFieldClass

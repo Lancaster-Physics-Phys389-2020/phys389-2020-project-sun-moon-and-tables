@@ -1,7 +1,6 @@
-from AbstractSimulation import AbstractSimulationClass, np, pd, deepcopy, stats
+from AbstractSimulation import AbstractSimulationClass, np, pd, deepcopy, const
 from SumEMFields import EMFieldClass
 from ParticleBunchClass import ParticleBunch
-import scipy.constants as const
 
 
 
@@ -67,8 +66,10 @@ class SimulationStandardClass(AbstractSimulationClass):
     
         while timeElapsed < self.duration:
             timestep = self.largeTimestep
-            meanXPosition = stats.mean([self.particleBunch.listOfParticles[i].position[0] 
-            for i in range(self.particleBunch.numberOfParticles)])
+            
+            meanXPosition = (sum([self.particleBunch.listOfParticles[i].position[0] 
+            for i in range(self.particleBunch.numberOfParticles)]) 
+            / float(self.particleBunch.numberOfParticles))
             acceleratingFieldDimensions = self.totalEMField.listOfElectricFields[0].listOfDimensions[0]
             # It is assumed that the acceleratingFieldDimensions is similar to the dimensions 
             # of other accelerating electric fields.
@@ -85,8 +86,10 @@ class SimulationStandardClass(AbstractSimulationClass):
 
             self.totalEMField.GiveAcceleration(self.particleBunch, timeElapsed)
             self.particleBunch.UpdateBunchMeanEnergy(), self.particleBunch.UpdateBunchEnergySpread()
-            
+
             numberOfTimesBreakIsPrevented = 0
+            # this prevents a timestep that is too large causing a particle to reach faster than the
+            # speed of light
             while True:
                 testIfVelocityTooHigh = (self.particleBunch.FindBunchMeanVelocity() 
                 + self.particleBunch.FindBunchMeanAcceleration() * timestep)
@@ -96,9 +99,11 @@ class SimulationStandardClass(AbstractSimulationClass):
                     timestep = 0.1 * timestep
                     numberOfTimesBreakIsPrevented += 1
             
-            for i in range(len(self.particleBunch.listOfParticles)):
+            for i in range(self.particleBunch.numberOfParticles):
                 self.particleBunch.listOfParticles[i].UpdateCromer(timestep)
             if numberOfTimesBreakIsPrevented==5:
+                print("The simulation was halted after %s secs as relativistic effects began to break down."
+                %(timeElapsed))
                 break
                 # if the timestep needed to be made 1e5 times smaller in order to move the simulation
                 # forward another timestep, then the simulation should stop and save instead of generating

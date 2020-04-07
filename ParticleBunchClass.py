@@ -16,12 +16,13 @@ class ParticleBunch:
                 particles in the bunch
             bunchMeanEnergy (float): The current mean total energy of a particle in the bunch
             restMassOfBunch (float): The rest mass of a particle in the bunch
+            bunchPositionMean (float): The initial mean position of the bunch in x, y and z
             name (string): Name of the bunch of particles
     """
 
     def __init__(self, numberOfParticles:int=1, bunchPositionSpread=1.0, bunchEnergySpread=0.0
     , bunchMeanEnergy=0.0, restMassOfBunch=const.proton_mass, chargeOfBunch=const.elementary_charge
-    , name='Bunch Name'):
+    , bunchPositionMean = 0.0, name='Bunch Name'):
         """ Constructor for the ParticleBunch class. 
                 Runs the CreateListOfParticles method upon ParticleBunch initialisation.
             
@@ -33,6 +34,7 @@ class ParticleBunch:
                     particles in the bunch
                 bunchMeanEnergy (float): The initial mean total energy of a particle in the bunch
                 restMassOfBunch (float): The rest mass of a particle in the bunch
+                bunchPositionMean (float): The initial mean position of the bunch in x, y and z
                 name (string): Name of the bunch of particles
         """
         self.numberOfParticles = numberOfParticles
@@ -42,6 +44,7 @@ class ParticleBunch:
         self.restMassOfBunch = restMassOfBunch
         self.chargeOfBunch = chargeOfBunch
         self.bunchPositionSpread = bunchPositionSpread
+        self.bunchPositionMean = bunchPositionMean
         # Instansiates the particle objects and adds them to the attribute: self.listOfParticles
         ParticleBunch.CreateListOfParticles(self)
 
@@ -81,7 +84,7 @@ class ParticleBunch:
                     the origin. Standard deviation is determined by class argument.
         """
         listOfParticles = []
-        listOfRandomPositions = np.random.normal(loc=0.0, scale=self.bunchPositionSpread
+        listOfRandomPositions = np.random.normal(loc=self.bunchPositionMean, scale=self.bunchPositionSpread
         , size=3*self.numberOfParticles)
         for i in range(self.numberOfParticles):
             listOfParticles.append(
@@ -89,8 +92,7 @@ class ParticleBunch:
                 , listOfRandomPositions[3*i+1], listOfRandomPositions[3*i+2]])
                 , velocity=np.array([ParticleBunch.CreateVelocitySpread(self)[i], 0.0, 0.0])
                 , acceleration=np.array([0.0, 0.0, 0.0]), restMass=self.restMassOfBunch
-                , charge=self.chargeOfBunch, name="%s %s"%(self.name, i+1))
-                )
+                , charge=self.chargeOfBunch, name="%s %s"%(self.name, i+1)))
         # adds listOfParticles as a class attribute
         self.listOfParticles = listOfParticles
         

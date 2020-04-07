@@ -1,12 +1,11 @@
 from abc import ABC, abstractmethod
 import numpy as np
-import statistics as stats
 import pandas as pd
 from copy import deepcopy
-
-from SumEMFields import EMFieldClass
-from ElectricExternalField import ElectricExternalFieldClass
+import scipy.constants as const
 from ParticleBunchClass import ParticleBunch
+from SumEMFields import EMFieldClass
+from Particle import Particle
 
 class AbstractSimulationClass(ABC):
     """ Abstract base class for building a simulation or set of simulations

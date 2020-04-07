@@ -14,12 +14,11 @@ class MagneticSynchrotronFieldClass(AbstractExternalFieldClass):
             name (str): Name of EM field
             listOfDimensions (list): List of maximum and minimum dimensions
                 of the field in 3D space
-
     """
 
     def __init__(self, magneticFieldStrength=np.array([0, 0, 0], dtype=float), particleBunch=ParticleBunch
     , angularFrequency=0.0, phaseShift=0.0, listOfDimensions = [[-1 * scipy.inf, scipy.inf] for i in range(3)]
-    , name='Magnetic External Field'):
+    , name='Magnetic Synchrotron Field'):
         """ Method inherits the __init__ from the parent class and assigns fieldStrength 
                 as magneticFieldStrength to use the GenerateField method in the parent class.
                 
@@ -38,11 +37,11 @@ class MagneticSynchrotronFieldClass(AbstractExternalFieldClass):
         self.fieldStrength = magneticFieldStrength
         self.particleBunch = particleBunch
         self.initialBField = np.linalg.norm(self.fieldStrength)
-        self.radius = (np.linalg.norm(self.particleBunch.FindBunchMeanVelocity()) * self.particleBunch.restMassOfBunch 
+        self.radius = (np.linalg.norm(self.particleBunch.FindBunchMeanMomentum()) 
         / (self.initialBField * self.particleBunch.chargeOfBunch))
         
     def __repr__(self):
-        return 'External Magnetic Field: {0}, Angular Frequency: {1}, Phase Shift: {2}\
+        return 'Magnetic Synchrotron Field: {0}, Angular Frequency: {1}, Phase Shift: {2}\
         , Magnetic Field Strength: {3}, Dimensions of the Magnetic Field: {4}'.format(
         self.name, self.angularFrequency, self.phaseShift, self.fieldStrength, self.listOfDimensions)
     
@@ -58,7 +57,7 @@ class MagneticSynchrotronFieldClass(AbstractExternalFieldClass):
                 multiplierOfBField (float): Value that the magnetic field must be multiplied by
                     in order to keep the bunch in a fixed radius circular path
         """
-        multiplierOfBField = (np.linalg.norm(self.particleBunch.FindBunchMeanVelocity()) * self.particleBunch.restMassOfBunch
+        multiplierOfBField = (np.linalg.norm(self.particleBunch.FindBunchMeanMomentum())
         / (self.radius * self.particleBunch.chargeOfBunch * self.initialBField))
         return multiplierOfBField
 
