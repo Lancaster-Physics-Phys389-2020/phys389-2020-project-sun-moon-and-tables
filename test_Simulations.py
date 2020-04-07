@@ -47,26 +47,31 @@ test_Simulation2 = SimulationPhaseChangeClass(listOfPhaseChangingFields=[test_El
 , duration=1, largeTimestep=1e-3, smallTimestep= 1e-6)
 
 def test_StandardRunSimulation():
+    # Runs the standard simulation and checks if the mean position of particles at the end of the simulation is correct
     test_Simulation.RunSimulation()
     meanXPosition = stats.mean([test_ParticleBunch.listOfParticles[i].position[0] 
     for i in range(test_ParticleBunch.numberOfParticles)])
     assert meanXPosition == pytest.approx(-121760, rel=0.01)
     
 def test_StandardSaveSimulation():
+    # Checks if the simulation data is being saved correctly
     assert test_Simulation.simulationTime[1] == 1e-6
     assert test_Simulation.simulationTime[-1] == pytest.approx(1.0, rel=0.01)
     
 def test_CreatePhaseShiftedFields():
+    # checks that the phase of changing fields are updated correctly
     test_Simulation2.CreatePhaseShiftedFields(iterationOfSimulation=5)
     assert [test_Simulation2.listOfPhaseChangingFields[i].phaseShift for i in range(2)] == [0.5, 0.5]
 
 def test_PhaseChangeRunSimulation():
+    # Runs the phase changing simulation and checks if the mean position of particles at the end of the simulation is correct
     test_Simulation2.RunSimulation()
     meanXPosition = stats.mean([test_ParticleBunch.listOfParticles[i].position[0] 
     for i in range(test_ParticleBunch.numberOfParticles)])
     assert meanXPosition == pytest.approx(-121760, rel=0.01)
 
 def test_PhaseChangeSaveSimulation():
+    # Checks if the simulation data is being saved correctly and checks the simulation produced the correct results
     finalSpreadList = test_Simulation2.simulationFinalSpread
     copyFinalSpreadList = deepcopy(test_Simulation2.simulationFinalSpread)
     copyFinalSpreadList.remove(min(copyFinalSpreadList))

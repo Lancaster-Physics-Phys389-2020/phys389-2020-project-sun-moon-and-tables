@@ -65,7 +65,7 @@ def test_UpdateForward():
 def test_GenerateElectricField():
     # check that an electric field can be created by a particle and is the correct vector at a distance
     assert test_Particle.electricField.GenerateField(affectedParticle=test_Particle2) == pytest.approx(
-        np.array([-8.55023151e-20, -1.02602778e-19, -1.19703241e-19]))
+        np.array([-1090.63746886, -1308.76496263, -1526.8924564]))
 
 def test_GenerateMagneticField():
     # check that a magnetic field can be created by a particle and is the correct vector at a distance
