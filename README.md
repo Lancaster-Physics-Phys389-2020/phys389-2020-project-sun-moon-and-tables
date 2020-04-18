@@ -10,9 +10,9 @@ To run the simulations within this project, run the main.py file. Four simulatio
 
 * main.py
 Launch file that contains four different simulations that can be run and analysed. Run this file to start the simulations.
-    Cyclotron simulation : Simulates a cyclotron accelerating a bunch of charged particles using a time varying electric field.
+Cyclotron simulation : Simulates a cyclotron accelerating a bunch of charged particles using a time varying electric field.
 Synchrotron Simulation: Simulates a synchotron accelerating a bunch of particles. Uses a time varying magnetic field to keep the radius of the bunch of particles constant, with two constant electric fields at opposite ends of the synchrotron ring to increase the velocity of the bunch.
-    Phase Change Simulation: Simulates a series of cyclotrons that have time varying electric fields with increasing phase shift added to their sinusoidal function. Shows the best phase shift to reduce the energy spread of the bunch of particles.
+Phase Change Simulation: Simulates a series of cyclotrons that have time varying electric fields with increasing phase shift added to their sinusoidal function. Shows the best phase shift to reduce the energy spread of the bunch of particles.
 Conservation Law Simulation: Simulates a collection of interacting charged particles with no external fields. As a result, conservation of linear momentum, angular momentum and energy of both particles and their fields can be measured.
 
 * Particle.py
