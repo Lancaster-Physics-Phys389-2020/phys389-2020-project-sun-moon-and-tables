@@ -4,7 +4,7 @@ class MagneticExternalFieldClass(AbstractExternalFieldClass):
     """ Class for generating oscillating magnetic fields.
 
         Class Attributes:
-            magneticfieldStrength (numpy array): Amplitude of magnetic field in 3D space
+            magneticfieldStrength (ndarray): Amplitude of magnetic field in 3D space
             angularFrequency (float): Angular frequency of EM field 
             phaseShift (float): Phase shift of oscillating cosine function (units of 2*pi)
             name (str): Name of EM field
@@ -19,7 +19,7 @@ class MagneticExternalFieldClass(AbstractExternalFieldClass):
                 as magneticFieldStrength to use the GenerateField method in the parent class.
                 
             Args:
-                magneticfieldStrength (numpy array): Amplitude of electric field in 3D space
+                magneticfieldStrength (ndarray): Amplitude of electric field in 3D space
                 angularFrequency (float): Angular frequency of EM field 
                 phaseShift (float): Phase shift of oscillating cosine function (units of 2*pi)
                 name (str): Name of EM field
@@ -44,6 +44,6 @@ class MagneticExternalFieldClass(AbstractExternalFieldClass):
                 affectedParticle (object: Particle): The particle being affected by the magnetic field
             
             Returns:
-                Magnetic Field (numpy array): The magnetic field affecting the particle
+                Magnetic Field (ndarray): The magnetic field affecting the particle
         """
         return super().GenerateField(timeElapsed, affectedParticle)

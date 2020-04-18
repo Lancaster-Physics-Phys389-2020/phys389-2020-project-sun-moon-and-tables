@@ -67,11 +67,15 @@ class ParticleBunch:
                     standard deviation correlated to class arguments of bunchMeanEnergy
                     and bunchEnergySpread
         """
+        # create initial energy spread of particles in bunch
         listOfRandomEnergies = np.random.normal(loc=self.bunchMeanEnergy
         , scale=self.bunchEnergySpread, size=self.numberOfParticles)
+
+        # determine velocity of particles in the bunch using their energy
         listOfRandomVelocities = [math.sqrt(const.speed_of_light ** 2 
         - (self.restMassOfBunch ** 2 * const.speed_of_light ** 6) 
         / listOfRandomEnergies[i] ** 2) for i in range(self.numberOfParticles)]
+
         return listOfRandomVelocities
        
     def CreateListOfParticles(self):
@@ -83,9 +87,14 @@ class ParticleBunch:
                 listOfRandomPositions (list): List of random positions centred about
                     the origin. Standard deviation is determined by class argument.
         """
-        listOfParticles = []
+        listOfParticles = [] # list that will contain particle objects
+        # randomly generated initial positions of particles
         listOfRandomPositions = np.random.normal(loc=self.bunchPositionMean, scale=self.bunchPositionSpread
         , size=3*self.numberOfParticles)
+
+        # appends a particle object with a random position in three dimensions, zero acceleration
+        # and a parallel velocity in the x direction, no initial velocity in y or z
+        # also saves a new name for every particle object
         for i in range(self.numberOfParticles):
             listOfParticles.append(
                 Particle(position=np.array([listOfRandomPositions[3*i]
@@ -93,6 +102,7 @@ class ParticleBunch:
                 , velocity=np.array([ParticleBunch.CreateVelocitySpread(self)[i], 0.0, 0.0])
                 , acceleration=np.array([0.0, 0.0, 0.0]), restMass=self.restMassOfBunch
                 , charge=self.chargeOfBunch, name="%s %s"%(self.name, i+1)))
+
         # adds listOfParticles as a class attribute
         self.listOfParticles = listOfParticles
         
@@ -103,85 +113,97 @@ class ParticleBunch:
             Parameters:
                 totalEnergy (float): Sum of the energy of all particles in the bunch
         """
-        totalEnergy = 0.0
+        totalEnergy = 0.0 # dummy variable
+
         for i in range(len(self.listOfParticles)):
             totalEnergy += self.listOfParticles[i].TotalEnergy()
+
         self.bunchMeanEnergy = (totalEnergy / float(len(self.listOfParticles)))
 
     def UpdateBunchEnergySpread(self):
         """ Method to update the bunchEnergySpread class attribute.
         
             Parameters:
-                spreadArray (numpy array): Array of values of the total energy of
+                spreadArray (ndarray): Array of values of the total energy of
                     each particle in the bunch.
         """
-        spreadArray = np.array([])
+        spreadArray = np.array([]) # dummy variable
+
         for i in range(len(self.listOfParticles)):
             spreadArray = np.append(spreadArray, self.listOfParticles[i].TotalEnergy())
+
         self.bunchEnergySpread = np.std(spreadArray)
 
     def FindBunchMeanVelocity(self):
         """ Method to return the mean velocity of the particles in the bunch.
 
             Parameters: 
-                totalVelocity (numpy array): Sum of the velocities of each particle
+                totalVelocity (ndarray): Sum of the velocities of each particle
                     in the bunch
             Returns:
-                Mean Velocity of Bunch (numpy array): The sum of all of the velocities
+                Mean Velocity of Bunch (ndarray): The sum of all of the velocities
                     of particles in the bunch divided by the number of particles in the
                     bunch.
         """
-        totalVelocity = np.array([0.0, 0.0, 0.0], dtype=float)
+        totalVelocity = np.array([0.0, 0.0, 0.0], dtype=float) # dummy variable
+
         for i in range(len(self.listOfParticles)):
             totalVelocity += self.listOfParticles[i].velocity
+
         return (totalVelocity / float(len(self.listOfParticles)))
     
     def FindBunchMeanPosition(self):
         """ Method to return the mean position of the particles in the bunch.
 
             Parameters: 
-                totalPosition (numpy array): Sum of the velocities of each particle
+                totalPosition (ndarray): Sum of the velocities of each particle
                     in the bunch
             Returns:
-                Mean position of Bunch (numpy array): The sum of all of the positions
+                Mean position of Bunch (ndarray): The sum of all of the positions
                     of particles in the bunch divided by the number of particles in the
                     bunch.
         """
-        totalPosition = np.array([0.0, 0.0, 0.0], dtype=float)
+        totalPosition = np.array([0.0, 0.0, 0.0], dtype=float) # dummy variable
+
         for i in range(len(self.listOfParticles)):
             totalPosition += self.listOfParticles[i].position
+
         return (totalPosition / float(len(self.listOfParticles)))
     
     def FindBunchMeanAcceleration(self):
         """ Method to return the mean acceleration of the particles in the bunch.
 
             Parameters: 
-                totalAcceleration (numpy array): Sum of the accelerations of each particle
+                totalAcceleration (ndarray): Sum of the accelerations of each particle
                     in the bunch
             Returns:
-                Mean acceleration of Bunch (numpy array): The sum of all of the accelerations
+                Mean acceleration of Bunch (ndarray): The sum of all of the accelerations
                     of particles in the bunch divided by the number of particles in the
                     bunch.
         """
-        totalAcceleration = np.array([0.0, 0.0, 0.0], dtype=float)
+        totalAcceleration = np.array([0.0, 0.0, 0.0], dtype=float) # dummy variable
+
         for i in range(len(self.listOfParticles)):
             totalAcceleration += self.listOfParticles[i].acceleration
+
         return (totalAcceleration / float(len(self.listOfParticles)))
 
     def FindBunchMeanMomentum(self):
         """ Method to return the mean momentum of the particles in the bunch.
 
             Parameters: 
-                totalMomentum (numpy array): Sum of the momentums of each particle
+                totalMomentum (ndarray): Sum of the momentums of each particle
                     in the bunch
             Returns:
-                Mean Momentum of Bunch (numpy array): The sum of all of the momenta
+                Mean Momentum of Bunch (ndarray): The sum of all of the momenta
                     of particles in the bunch divided by the number of particles in the
                     bunch.
         """
-        totalMomentum = np.array([0.0, 0.0, 0.0], dtype=float)
+        totalMomentum = np.array([0.0, 0.0, 0.0], dtype=float) # dummy variable
+
         for i in range(len(self.listOfParticles)):
             totalMomentum += self.listOfParticles[i].Momentum()
+            
         return (totalMomentum / float(len(self.listOfParticles)))
 
 

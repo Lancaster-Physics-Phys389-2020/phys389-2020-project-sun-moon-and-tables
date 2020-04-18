@@ -1,0 +1,19 @@
+* Python packages used
+pytest
+numpy
+pandas
+math
+scipy and scipy.constants
+from abc: ABC, abstractmethod
+from copy: deepcopy
+matplotlib
+from mpl_toolkits.mplot3d: Axes3D
+
+* Advanced computing techniques used
+Inheritance
+Composition
+Abstract classes
+Abstract methods
+Dataframes in pandas
+Version control in GitHub
+

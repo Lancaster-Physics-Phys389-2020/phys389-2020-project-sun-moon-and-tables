@@ -25,7 +25,7 @@ class SimulationPhaseChangeClass(AbstractSimulationClass):
                 bunch is inside of the accelerating electric field.
     """
 
-    def __init__(self, listOfPhaseChangingFields=[ElectricExternalFieldClass], phaseResolution=50
+    def __init__(self, listOfPhaseChangingFields=[ElectricExternalFieldClass], phaseResolution:int=50
     , totalEMField=EMFieldClass, particleBunch=ParticleBunch, duration=0.1, largeTimestep=1e-3
     , smallTimestep=1e-8):
         """ Constructor for the SimulationPhaseChangeClass class.
@@ -64,69 +64,92 @@ class SimulationPhaseChangeClass(AbstractSimulationClass):
                     x position of particles in the simulation.
                 acceleratingFieldDimensions (list): Dimensions of the first phase changing field.
         """
-        self.simulationFinalSpread = [] # our y axis data
-        self.simulationPhaseShift = [] # our x axis data
         #creates a copy of the initial state of the system
-        initialListOfParticles = deepcopy(self.particleBunch.listOfParticles) 
+        initialListOfParticles = deepcopy(self.particleBunch.listOfParticles)
+
+        # Runs a new simulation each time this for loop is iterated
         for j in range(self.phaseResolution): 
-            #central for loop for the simulations.
-            # each time this is iterated, a new simulation is run. the final energy spread
-            #  for that simulation is then saved.
+            
+            # shifts all phase shifted fields for the next simulation
             SimulationPhaseChangeClass.CreatePhaseShiftedFields(self, j)
 
             timeElapsed = 0.0
     
             while timeElapsed < self.duration:
                 timestep = self.largeTimestep
+
+                # this simulation accelerates a bunch of particles about the x-z plane, starting at
+                # 0.0, 0.0, 0.0 . As a result, the x position of the bunch is useful at informing 
+                # where accelerating electric fields will be.
                 meanXPosition = (sum([self.particleBunch.listOfParticles[i].position[0] 
                 for i in range(self.particleBunch.numberOfParticles)]) 
                 / float(self.particleBunch.numberOfParticles))
-                acceleratingFieldDimensions = self.listOfPhaseChangingFields[0].listOfDimensions[0]
+
                 # It is assumed that the acceleratingFieldDimensions is similar to the dimensions 
                 # of other accelerating electric fields.
                 # If these dimensions differ greatly, the time-steps of the simulation will not be
                 # adjusted accurately.
+                acceleratingFieldDimensions = self.listOfPhaseChangingFields[0].listOfDimensions[0]
+                
+                # if the particles are inside of the accelerating field, the simulation runs slower
                 if (meanXPosition < acceleratingFieldDimensions[1] and 
                 meanXPosition > acceleratingFieldDimensions[0]):
                     timestep = self.smallTimestep
-                    # if the particles are inside of the accelerating field, the simulation runs slower
-                
+                   
+                # give all particles correct acceleration by determining the total electric
+                # and magnetic fields that act on the particles
                 self.totalEMField.GiveAcceleration(self.particleBunch, timeElapsed)
+                # update the mean energy and std. dev. in energy of the bunch with the current values
                 self.particleBunch.UpdateBunchMeanEnergy(), self.particleBunch.UpdateBunchEnergySpread()
 
-                numberOfTimesBreakIsPrevented = 0
-                # this prevents a timestep that is too large causing a particle to move faster than the
+                # the following prevents a timestep that is too large causing a particle to move faster than the
                 # speed of light
+                # therefore, this check comes after updating acceleration but before applying the euler cromer
+                # method
+                numberOfTimesBreakIsPrevented = 0
+
                 while True:
+
                     testIfVelocityTooHigh = (self.particleBunch.FindBunchMeanVelocity() 
                     + self.particleBunch.FindBunchMeanAcceleration() * timestep)
+
+                    # if the velocity is lower than the speed of light, continue
                     if np.linalg.norm(testIfVelocityTooHigh) < const.speed_of_light:
                         break
+
                     else:
+                        # make the timestep 10 times smaller and try again
                         timestep = 0.1 * timestep
                         numberOfTimesBreakIsPrevented += 1
 
+                # apply the euler cromer method to update the velocity and position of all particles                
                 for i in range(self.particleBunch.numberOfParticles):
                     self.particleBunch.listOfParticles[i].UpdateCromer(timestep)
+                
+                # if the timestep needed to be made 1e5 times smaller in order to move the simulation
+                # forward another timestep, then the simulation should stop and save instead of generating
+                # corrupted data.
                 if numberOfTimesBreakIsPrevented == 5:
                     print("The simulation was halted after %s secs as relativistic effects began to break down."
                     %(timeElapsed))
                     break
-                # if the timestep needed to be made 1e5 times smaller in order to move the simulation
-                # forward another timestep, then the simulation should stop and save instead of generating
-                # corrupted data.
                 timeElapsed += timestep
 
+            # save the final energy spread of the bunch
             self.simulationFinalSpread.append(deepcopy(self.particleBunch.bunchEnergySpread))
+            # save the phase shift of the first alternating electromagnetic field
+            # all phase changing fields have the same phase shift in any simulation
             self.simulationPhaseShift.append(deepcopy(self.listOfPhaseChangingFields[0].phaseShift))
-            self.particleBunch.listOfParticles = deepcopy(initialListOfParticles)
+
             # at the end of each simulation, the initial particle state is restored
+            self.particleBunch.listOfParticles = deepcopy(initialListOfParticles)
             print(j+1, "simulations completed")
+
+        # at the end of all the simulations, the first value is added to the end.
+        # This ensures the radial graph forms a complete circle
         self.simulationFinalSpread.append(deepcopy(self.simulationFinalSpread[0]))
         self.simulationPhaseShift.append(deepcopy(self.simulationPhaseShift[0]+1.0))
-        # at the end of all the simulations, the first value is stuck to the end.
-        #  This ensures the radial graph forms a complete circle
-
+        
     def CreatePhaseShiftedFields(self, iterationOfSimulation:int):
         """ Method to shift the phase of fields in listOfPhaseChangingFields
 
@@ -138,6 +161,7 @@ class SimulationPhaseChangeClass(AbstractSimulationClass):
                     determines what fraction the phase will be shifted in each iteration
         """
         inverseOfResolution = 1 / self.phaseResolution
+        # starts at smallest phase shift and ends at a full period phase shift
         for i in self.listOfPhaseChangingFields:
             i.phaseShift = np.round(inverseOfResolution + inverseOfResolution * iterationOfSimulation, decimals = 5)
     
@@ -153,5 +177,6 @@ class SimulationPhaseChangeClass(AbstractSimulationClass):
                 dataFrame (pandas dataframe): Dataframe of dictionary
         """
         dictionary = {'Phase':self.simulationPhaseShift, 'FinalSpread':self.simulationFinalSpread}
+
         dataFrame = pd.DataFrame(dictionary)
         dataFrame.to_pickle("%s.pkl"%(fileName))

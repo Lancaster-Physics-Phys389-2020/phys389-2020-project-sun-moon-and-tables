@@ -36,16 +36,17 @@ class PointMagneticFieldClass(AbstractPointFieldClass):
                     magnetic field
             
             Parameters:
-                displacement (numpy array): The vector that represents the position of 
+                displacement (ndarray): The vector that represents the position of 
                     the source particle subtracted from the position of the affected particle.
                 distance (float): The norm of the displacement between the two particles
             
             Returns:
-                Magnetic Field (numpy array): The magnetic field that acts on the affectedParticle
+                Magnetic Field (ndarray): The magnetic field that acts on the affectedParticle
                     , originating from the sourceParticle.
         """
         displacement = affectedParticle.position - self.sourceParticle.position
         distance = np.linalg.norm(displacement)
+        
         return (const.mu_0 * self.sourceParticle.charge * np.cross(
         self.sourceParticle.velocity, displacement) / (4 * const.pi  
         * distance * distance * distance))

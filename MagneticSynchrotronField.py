@@ -8,7 +8,7 @@ class MagneticSynchrotronFieldClass(AbstractExternalFieldClass):
             radius (float): The initial radius that the bunch of particles would have using the 
                 initial conditions of the simulation
             initialBField (float): The norm of the initial magnetic field
-            magneticfieldStrength (numpy array): Amplitude of magnetic field in 3D space
+            magneticfieldStrength (ndarray): Amplitude of magnetic field in 3D space
             angularFrequency (float): Angular frequency of EM field 
             phaseShift (float): Phase shift of oscillating cosine function (units of 2*pi)
             name (str): Name of EM field
@@ -23,7 +23,7 @@ class MagneticSynchrotronFieldClass(AbstractExternalFieldClass):
                 as magneticFieldStrength to use the GenerateField method in the parent class.
                 
             Args:
-                magneticfieldStrength (numpy array): Amplitude of electric field in 3D space
+                magneticfieldStrength (ndarray): Amplitude of electric field in 3D space
                 particleBunch (object: ParticleBunch): Bunch of particles that the field increases contains by
                     increasing in magnitude
                 angularFrequency (float): Angular frequency of EM field 
@@ -70,7 +70,7 @@ class MagneticSynchrotronFieldClass(AbstractExternalFieldClass):
                 affectedParticle (object: Particle): The particle being affected by the magnetic field
             
             Returns:
-                Magnetic Field (numpy array): The magnetic field affecting the particle multipled by
+                Magnetic Field (ndarray): The magnetic field affecting the particle multipled by
                     the required increase in magnetic field amplitude in order to keep the circular
                     radius of the bunch of particles fixed
         """

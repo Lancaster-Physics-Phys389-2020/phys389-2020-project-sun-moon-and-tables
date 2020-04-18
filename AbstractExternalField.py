@@ -8,7 +8,7 @@ class AbstractExternalFieldClass(ABC, GenericFieldClass):
     """ Abstract base class for external electromagnetic fields that oscillate sinusoidally
 
     Class attributes:
-            fieldStrength (numpy array): Amplitude of EM field in 3D space
+            fieldStrength (ndarray): Amplitude of EM field in 3D space
             angularFrequency (float): Angular frequency of EM field 
             phaseShift (float): Phase shift of oscillating cosine function (units of 2*pi)
             name (str): Name of EM field
@@ -23,7 +23,7 @@ class AbstractExternalFieldClass(ABC, GenericFieldClass):
         """ Constructor for any external EM field. Inherits the __init__ from GenericFieldClass
         
             Args:
-                fieldStrength (numpy array): Amplitude of EM field in 3D space
+                fieldStrength (ndarray): Amplitude of EM field in 3D space
                 angularFrequency (float): Angular frequency of EM field 
                 phaseShift (float): Phase shift of oscillating cosine function (units of 2*pi)
                 name (str): Name of EM field
@@ -59,9 +59,11 @@ class AbstractExternalFieldClass(ABC, GenericFieldClass):
                 boundaries in that dimension. 0.0 means the particle is outside of the field
                 boundaries in that dimension.
         """
+        # self.listOfDimensions[i][0]: minimum limit
+        # self.listOfDimensions[i][1]: maximum limit
+        # if both conditions are true, no change is made to isInFieldValue
+        # if isInFieldValue is 1.0, field is applied. If isInFieldValue is 0.0, field is not applied
         isInFieldValue = 1.0
-        # self.listOfDimensions[i][0]: minimum limit, self.listOfDimensions[i][1]: maximum limit
-        # if both conditions are true, no change is made to isInFieldArray[i]
         for i in range(3):
             if not (affectedParticle.position[i] > self.listOfDimensions[i][0]
             and affectedParticle.position[i] < self.listOfDimensions[i][1]):
@@ -76,11 +78,13 @@ class AbstractExternalFieldClass(ABC, GenericFieldClass):
             affectedParticle (object: Particle): The particle being affected by the field
         
         Returns:
-            Strength of Field (numpy array): Strength of the field in 3D.
+            Strength of Field (ndarray): Strength of the field in three dimensions.
         """
         # calls isParticleInField to determine if the affected particle
-        # is hit by the electric or magnetic field. multiplies the "truth array"
-        # for the dimensions of the field by the time dependence for the field.
+        # is within the boundaries of the field. 
+        # cosine function will return the amplitude of the field with fieldStrength
+        # if angularFrequency is 0.0
+        # phaseShift refers to the fraction of a period that the field is shifted by
         return (math.cos(self.angularFrequency * timeElapsed 
         + self.phaseShift * 2 * math.pi) * np.multiply(AbstractExternalFieldClass.IsParticleInField(self, affectedParticle)
         , self.fieldStrength))

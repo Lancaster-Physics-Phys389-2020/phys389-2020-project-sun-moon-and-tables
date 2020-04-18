@@ -12,9 +12,9 @@ class Particle:
                 that the particle generates.
             magneticField (object: PointMagneticFieldClass): Magnetic field
                 that the particle generates.
-            position (numpy array): Current position of the particle
-            velocity (numpy array): Current velocity of the particle
-            acceleration (numpy array): Current acceleration of the particle
+            position (ndarray): Current position of the particle
+            velocity (ndarray): Current velocity of the particle
+            acceleration (ndarray): Current acceleration of the particle
             name (string): Name of the particle
             restMass (float): Rest mass of the particle
             charge (float): Charge of the particle
@@ -32,9 +32,9 @@ class Particle:
         """ The constructor for Particle Class
 
             Args:
-                position (numpy array): Initial position of the particle
-                velocity (numpy array): Initial velocity of the particle
-                acceleration (numpy array): Initial acceleration of the particle
+                position (ndarray): Initial position of the particle
+                velocity (ndarray): Initial velocity of the particle
+                acceleration (ndarray): Initial acceleration of the particle
                 name (string): Name of the particle
                 restMass (float): Rest mass of the particle
                 charge (float): Charge of the particle
@@ -64,14 +64,14 @@ class Particle:
         """
         return (self.restMass * const.speed_of_light * const.speed_of_light)
 
-    def BetaVector(self):
-        """ Method that returns Beta (velocity/speed of light) as a vector
+    def BetaVelocity(self):
+        """ Method that returns Beta (velocity/speed of light) as a float
 
             Returns:
-                Beta (numpy array): Ratio of the velocity to the speed of light
+                Beta (float): Ratio of the velocity to the speed of light
         """
-        return self.velocity / const.speed_of_light
-
+        return np.linalg.norm(self.velocity) / const.speed_of_light
+        
     def LorentzFactor(self):
         """ Method that returns the Lorentz Factor of the particle.
 
@@ -81,8 +81,7 @@ class Particle:
         """
         # Use of abs() and x ** 0.5 provides a more stable calculation of lorentz
         # factor than math.sqrt() at high velocities.
-        return 1 / abs( 1 - np.linalg.norm(Particle.BetaVector(self))
-         * np.linalg.norm(Particle.BetaVector(self)) ** 0.5)
+        return 1 / abs( 1 - Particle.BetaVelocity(self) * Particle.BetaVelocity(self))**0.5
         
     def RelativisticMass(self):
         """ Method that returns the relativistic mass of the particle
@@ -97,7 +96,7 @@ class Particle:
         """ Method that returns the relativistic momentum of the particle
 
             Returns:
-                Relativistic Momentum (numpy array): Classical momentum multipled by
+                Relativistic Momentum (ndarray): Classical momentum multipled by
                     the Lorentz factor of the particle
         """
         return (np.multiply(Particle.LorentzFactor(self)
@@ -147,7 +146,7 @@ class Particle:
                 affectedParticle (object: Particle): The particle being affected by the field
             
             Returns:
-                Electric Field (numpy array): The electric field that acts on the affected particle
+                Electric Field (ndarray): The electric field that acts on the affected particle
                     , originating from this particle.
         """
         return self.electricField.GenerateField(affectedParticle)
@@ -159,7 +158,7 @@ class Particle:
                 affectedParticle (object: Particle): The particle being affected by the field
             
             Returns:
-                Magnetic Field (numpy array): The magnetic field that acts on the affected particle
+                Magnetic Field (ndarray): The magnetic field that acts on the affected particle
                     , originating from this particle.
         """
         return self.magneticField.GenerateField(affectedParticle)

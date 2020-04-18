@@ -1,7 +1,6 @@
 import numpy as np 
 import math
 import scipy.constants as const
-import multiprocessing
 from PointElectricField import PointElectricFieldClass
 from PointMagneticField import PointMagneticFieldClass
 from ElectricExternalField import ElectricExternalFieldClass
@@ -49,29 +48,34 @@ class EMFieldClass:
                 timeElapsed (float): Time that has elapsed in the simulation
             
             Parameters:
-                sumE (numpy array): Stores the sum of the electric field from all other particles and any
+                sumE (ndarray): Stores the sum of the electric field from all other particles and any
                     external fields.
-                sumB (numpy array): Stores the sum of the magnetic field from all other particles and any
+                sumB (ndarray): Stores the sum of the magnetic field from all other particles and any
                     external fields.
             
             Returns:
                 [sumE, sumB] (list): List containing the total electric and magnetic fields that are affecting
                     the affectedParticle at timeElapsed in the simulation.
         """
+        # adds the external electric fields affecting the particle.
         sumE = sum([self.listOfElectricFields[i].GenerateField(timeElapsed, affectedParticle) 
         for i in range(len(self.listOfElectricFields))])
-        # adds the external electric fields affecting the particle.
+
+        # adds the external magnetic fields affecting the particle
         sumB = sum([self.listOfMagneticFields[i].GenerateField(timeElapsed, affectedParticle) 
         for i in range(len(self.listOfMagneticFields))])
-        # adds the external magnetic fields affecting the particle
+        
+        # if the source particle of the point EM is not the affected particle by the EM field, the contributing
+        # fields are added.
         for k in range(len(self.bunchOfParticles.listOfParticles)):
+
             if affectedParticle != self.bunchOfParticles.listOfParticles[k]:
                 sumE += self.bunchOfParticles.listOfParticles[k].GenerateElectricField(affectedParticle)
                 sumB += self.bunchOfParticles.listOfParticles[k].GenerateMagneticField(affectedParticle)
+
             else:
                 pass
-        # if the source particle of the point EM is not the affected particle by the EM field, the contributing
-        # fields are added.
+        
         return [sumE, sumB]
         
     def GiveAcceleration(self, particleBunch:ParticleBunch, timeElapsed):
@@ -83,8 +87,10 @@ class EMFieldClass:
                     to accelerate them all.
                 timeElapsed (float): Time that has passed in the simulation so far
         """
+        # Lorentz Force acting on each particle, with a field with electric and magnetic components.
+        # Force divided by relativistic mass results in acceleration of the particle
         for i in particleBunch.listOfParticles:
             i.acceleration = (np.divide((i.charge * EMFieldClass.SumOfEMFields(self, i, timeElapsed)[0]
             + i.charge * np.cross(i.velocity, EMFieldClass.SumOfEMFields(self, i, timeElapsed)[1]))
             , i.RelativisticMass()))
-        # Lorentz Force acting on a particle, with a field with electric and magnetic components.
+        

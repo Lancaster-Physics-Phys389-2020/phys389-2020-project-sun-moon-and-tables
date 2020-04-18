@@ -19,16 +19,16 @@ def test_RestEnergy():
     # checks that rest energy is calculated correctly
     assert test_Particle.RestEnergy() == pytest.approx(2.6962655362104528e+17)
 
-def test_BetaVector():
+def test_BetaVelocity():
     # checks that Beta is calculated correctly
-    assert test_Particle.BetaVector() == pytest.approx(np.array([0.00333564, 0.00500346, 0.00667128]))
+    assert test_Particle.BetaVelocity() == pytest.approx(0.00898148813192376)
 
 def test_LorentzFactor():
     # checks Lorentz factor is calculated correctly
-    assert test_Particle.LorentzFactor() == pytest.approx(1.0008519068013697)
+    assert test_Particle.LorentzFactor() == pytest.approx(1.0000403360048906)
 
 def test_RelativisticMass():
-    assert test_Particle.RelativisticMass() == pytest.approx(3.002555720404109)
+    assert test_Particle.RelativisticMass() == pytest.approx(3.0001210080146716)
     # worth mentioning that relativistic mass is not acting as a vector, because
     # this caused problems with the magnetic field, the mass vector would not be
     # correct for updates of acceleration and resulted in strange energy behaviour.
@@ -36,7 +36,7 @@ def test_RelativisticMass():
 def test_Momentum():
     # checks momentum is calculated correctly
     assert test_Particle.Momentum() == pytest.approx(
-        np.array([3002555.72040411, 4503833.58060616, 6005111.44080822]))
+        np.array([3000121.00801467, 4500181.51202201, 6000242.01602934]))
 
 def test_TotalEnergy():
     # checks total energy is calculated correctly
@@ -44,7 +44,7 @@ def test_TotalEnergy():
 
 def test_KineticEnergy():
     # checks kinetic energy is calculated correctly
-    assert test_Particle.KineticEnergy() == pytest.approx(10893316812256.0)
+    assert test_Particle.KineticEnergy() == pytest.approx(10875657985504.0)
 
 def test_UpdateCromer():
     test_Particle.UpdateCromer(deltaT=1.0)

@@ -11,7 +11,6 @@ from SimulationConservationLaws import SimulationConservationLawsClass
 import scipy.constants as const
 import scipy
 import numpy as np
-import time
 import math
 
 cyclotronParticleBunch = ParticleBunch(numberOfParticles=4, bunchEnergySpread=1e-22, bunchPositionSpread=1e-3
@@ -25,27 +24,25 @@ cyclotronEField = ElectricExternalFieldClass(electricFieldStrength=np.array([1e4
 , listOfDimensions=[[-1, 1], [-1 * scipy.inf, scipy.inf], [-1 * scipy.inf, scipy.inf]]
 , angularFrequency=1e-6 * const.elementary_charge / const.proton_mass
 , phaseShift=0.0, name='cyclotronEField')
+# phase shift is measured as a fraction of a period
 
-cyclotronBField1 = MagneticExternalFieldClass(magneticFieldStrength=np.array([0, 1e-6, 0])
-, name='cyclotronBField1')
+cyclotronBField = MagneticExternalFieldClass(magneticFieldStrength=np.array([0, 1e-6, 0])
+, name='cyclotronBField')
 
 cyclotronEMField = EMFieldClass(bunchOfParticles=cyclotronParticleBunch
-, listOfElectricFields=[cyclotronEField], listOfMagneticFields=[cyclotronBField1]
+, listOfElectricFields=[cyclotronEField], listOfMagneticFields=[cyclotronBField]
 , name='cyclotronEMField')
 
 cyclotronSimulation = SimulationStandardClass(totalEMField=cyclotronEMField
-, particleBunch=cyclotronParticleBunch, duration=4, largeTimestep=1e-3, smallTimestep=1e-6)
+, particleBunch=cyclotronParticleBunch, duration=3, largeTimestep=5e-4, smallTimestep=1e-6)
 
-# # Run conditions for the example Cyclotron Simulation
-# start = time.time()
-# cyclotronSimulation.RunSimulation()
-# end = time.time()
-# print("Simulation took %s seconds"%(end - start))
-# cyclotronSimulation.SaveSimulation("cyclotron")
-# cyclotronPlot = PlottingClass("cyclotron")
-# cyclotronPlot.ThreeDPositionPlot()
-# cyclotronPlot.MeanParticleVelocityPlot()
-# cyclotronPlot.MeanEnergyPlot()
+# Run conditions for the example Cyclotron Simulation
+cyclotronSimulation.RunSimulation()
+cyclotronSimulation.SaveSimulation("cyclotron")
+cyclotronPlot = PlottingClass("cyclotron")
+cyclotronPlot.ThreeDPositionPlot()
+cyclotronPlot.MeanParticleVelocityPlot()
+cyclotronPlot.MeanEnergyPlot()
 
 synchrotronParticleBunch = ParticleBunch(numberOfParticles=1, bunchEnergySpread=1e-22, bunchPositionSpread=1e-6
 , bunchMeanEnergy=3.5356655116389166e-08, restMassOfBunch=92*const.proton_mass+143*const.neutron_mass
@@ -53,11 +50,11 @@ synchrotronParticleBunch = ParticleBunch(numberOfParticles=1, bunchEnergySpread=
 , name='Uranium')
 # 3.5356655116389166e-08 J of energy to initialise uranium atoms with 1000m/s
 
-synchrotronBField0 = MagneticSynchrotronFieldClass(magneticFieldStrength=np.array([0, 6e-8, 0])
-, name='synchotronBField1', particleBunch=synchrotronParticleBunch)
+synchrotronBField = MagneticSynchrotronFieldClass(magneticFieldStrength=np.array([0, 6e-8, 0])
+, name='synchotronBField', particleBunch=synchrotronParticleBunch)
 
 synchrotronRadius = (np.linalg.norm(synchrotronParticleBunch.FindBunchMeanMomentum())
-/ (np.linalg.norm(synchrotronBField0.fieldStrength) * synchrotronParticleBunch.chargeOfBunch))
+/ (np.linalg.norm(synchrotronBField.fieldStrength) * synchrotronParticleBunch.chargeOfBunch))
 
 synchrotronEField1 = ElectricExternalFieldClass(electricFieldStrength=np.array([3e4, 0, 0])
 , listOfDimensions=[[-1, 1], [-1 * scipy.inf, scipy.inf], [-1, 1]], name='synchrotronEField1')
@@ -67,29 +64,26 @@ synchrotronEField2 = ElectricExternalFieldClass(electricFieldStrength=np.array([
 , name='synchrotronEField2')
 
 synchrotronEMField = EMFieldClass(bunchOfParticles=synchrotronParticleBunch
-, listOfElectricFields=[synchrotronEField1, synchrotronEField2], listOfMagneticFields=[synchrotronBField0]
+, listOfElectricFields=[synchrotronEField1, synchrotronEField2], listOfMagneticFields=[synchrotronBField]
 , name='synchrotronEMField')
 
 synchrotronSimulation = SimulationStandardClass(totalEMField=synchrotronEMField
 , particleBunch=synchrotronParticleBunch, duration=0.0145, largeTimestep=1e-7, smallTimestep=5e-8)
 
-# # Run conditions for the example Synchrotron Simulation
-# start = time.time()
-# synchrotronSimulation.RunSimulation()
-# end = time.time()
-# print("Simulation took %s seconds"%(end - start))
-# synchrotronSimulation.SaveSimulation("synchrotron")
-# synchrotronPlot = PlottingClass("synchrotron")
-# synchrotronPlot.ThreeDPositionPlot()
-# synchrotronPlot.MeanParticleVelocityPlot()
-# synchrotronPlot.MeanEnergyPlot()
+# Run conditions for the example Synchrotron Simulation
+synchrotronSimulation.RunSimulation()
+synchrotronSimulation.SaveSimulation("synchrotron")
+synchrotronPlot = PlottingClass("synchrotron")
+synchrotronPlot.ThreeDPositionPlot()
+synchrotronPlot.MeanParticleVelocityPlot()
+synchrotronPlot.MeanEnergyPlot()
 
-phaseChangeParticleBunch = ParticleBunch(numberOfParticles=3, bunchEnergySpread=1e-22, bunchPositionSpread=1e-3
+phaseChangeParticleBunch = ParticleBunch(numberOfParticles=3, bunchEnergySpread=1e-22, bunchPositionSpread=1e-2
 , bunchMeanEnergy=1.5032775929044686e-10, restMassOfBunch=const.proton_mass, chargeOfBunch=const.elementary_charge
 , name='Proton')
 
 phaseChangeEField = ElectricExternalFieldClass(electricFieldStrength=np.array([1e5, 0, 0])
-, listOfDimensions=[[-0.5, 0.5], [-1 * scipy.inf, scipy.inf], [-1 * scipy.inf, scipy.inf]]
+, listOfDimensions=[[-1, 1], [-1 * scipy.inf, scipy.inf], [-1 * scipy.inf, scipy.inf]]
 , angularFrequency=1e-7 * const.elementary_charge / const.proton_mass
 , phaseShift=0.0, name='Phase change time-varying electric field')
 
@@ -102,18 +96,16 @@ phaseChangeEMField = EMFieldClass(bunchOfParticles=phaseChangeParticleBunch
 
 phaseChangeSimulation = SimulationPhaseChangeClass(listOfPhaseChangingFields=[phaseChangeEField]
 , phaseResolution=48, totalEMField=phaseChangeEMField, particleBunch=phaseChangeParticleBunch
-, duration=0.5, largeTimestep=1e-3, smallTimestep=1e-6)
+, duration=0.5, largeTimestep=5e-4, smallTimestep=1e-6)
 
-# # Run conditions for the example Change of Phase Simulation
-# start = time.time()
-# fileNamePhaseChange = "phase change simulation"
-# phaseChangeSimulation.RunSimulation()
-# end = time.time()
-# print("Simulation took %s seconds"%(end - start))
-# phaseChangeSimulation.SaveSimulation(fileNamePhaseChange)
-# plotSimulationPhaseChange = PlottingClass(fileNamePhaseChange)
-# plotSimulationPhaseChange.RadialPhaseChangePlot()
-# plotSimulationPhaseChange.PhaseChangePlot("log")
+# Run conditions for the example Change of Phase Simulation
+
+fileNamePhaseChange = "phase change simulation"
+phaseChangeSimulation.RunSimulation()
+phaseChangeSimulation.SaveSimulation(fileNamePhaseChange)
+plotSimulationPhaseChange = PlottingClass(fileNamePhaseChange)
+plotSimulationPhaseChange.RadialPhaseChangePlot()
+plotSimulationPhaseChange.PhaseChangePlot("log")
 
 conservationParticleBunch = ParticleBunch(numberOfParticles=2, bunchEnergySpread=0.0
 , bunchMeanEnergy=1.5032775928961087e-10, restMassOfBunch=const.proton_mass
@@ -128,25 +120,24 @@ conservationEMField = EMFieldClass(bunchOfParticles=conservationParticleBunch, l
 conservationLawSimulation = SimulationConservationLawsClass(totalEMField=conservationEMField
 , particleBunch=conservationParticleBunch, duration=10e-5, largeTimestep=1e-7, spaceResolution=4)
 
-# # optional changes to ensure a stable simulation
-# for i in range(math.floor(conservationParticleBunch.numberOfParticles / 2)):
-# # this alternates the charge and the starting velocity of initial particles
-#     conservationParticleBunch.listOfParticles[2*i+1].charge = -1 * conservationParticleBunch.chargeOfBunch
-#     conservationParticleBunch.listOfParticles[2*i+1].velocity = -1 * conservationParticleBunch.listOfParticles[0].velocity
-# # for a proton anti-proton pair, these initial positions are good for creating a oscillating system
-# conservationParticleBunch.listOfParticles[0].position = np.array([0.00501547, 0.00493024, 0.00498064])
-# conservationParticleBunch.listOfParticles[1].position = np.array([0.0048881,  0.00503995, 0.00492297])
+# optional changes to ensure a stable simulation
+for i in range(math.floor(conservationParticleBunch.numberOfParticles / 2)):
+# this alternates the charge and the starting velocity of initial particles
+    conservationParticleBunch.listOfParticles[2*i+1].charge = -1 * conservationParticleBunch.chargeOfBunch
+    conservationParticleBunch.listOfParticles[2*i+1].name = "Anti-proton %s"%(math.ceil((2*i+1)/2))
+    conservationParticleBunch.listOfParticles[2*i+1].velocity = -1 * conservationParticleBunch.listOfParticles[0].velocity
+# for a proton anti-proton pair, these initial positions are good for creating a oscillating system
+conservationParticleBunch.listOfParticles[0].position = np.array([0.00501547, 0.00493024, 0.00498064])
+conservationParticleBunch.listOfParticles[1].position = np.array([0.0048881,  0.00503995, 0.00492297])
 
-# # Run conditions for the Simulation to test conservation laws
-# start = time.time()
-# fileNameConservationLaw = "conservation law simulation"
-# conservationLawSimulation.RunSimulation()
-# end = time.time()
-# print("Simulation took %s seconds"%(end - start))
-# conservationLawSimulation.SaveSimulation(fileNameConservationLaw)
-# plotConservationLaw = PlottingClass(fileNameConservationLaw)
-# plotConservationLaw.ThreeDPositionPlot()
-# plotConservationLaw.ConservationOfEnergyFieldsPlot()
-# plotConservationLaw.ConservationOfEnergyParticlesPlot()
-# plotConservationLaw.ConservationOfAngMomentumPlot()
-# plotConservationLaw.ConservationOfMomentumPlot()
+# Run conditions for the Simulation to test conservation laws
+
+fileNameConservationLaw = "conservation law simulation"
+conservationLawSimulation.RunSimulation()
+conservationLawSimulation.SaveSimulation(fileNameConservationLaw)
+plotConservationLaw = PlottingClass(fileNameConservationLaw)
+plotConservationLaw.ThreeDPositionPlot()
+plotConservationLaw.ConservationOfEnergyFieldsPlot()
+plotConservationLaw.ConservationOfEnergyParticlesPlot()
+plotConservationLaw.ConservationOfAngMomentumPlot()
+plotConservationLaw.ConservationOfMomentumPlot()

@@ -64,10 +64,13 @@ class SimulationConservationLawsClass(AbstractSimulationClass):
         self.simulationTime = []
         self.simulationState = []
 
+        # creating the listOfPositions and dictionaryOfEnergyDensity in this way reduces the need
+        # to create this list and dictionary from scratch every time these class attributes are called.
         self.listOfPositions = []
-        SimulationConservationLawsClass.CreateListOfPositions(self)
+        SimulationConservationLawsClass.CreateListOfPositions(self) # creates the list of positions
         self.dictionaryOfEnergyDensity = {}
-        SimulationConservationLawsClass.CreateDictionary(self)
+        SimulationConservationLawsClass.CreateDictionary(self) # creates the dictionary of energies
+
         # dummyParticle that tests the electric and magnetic field at different points
         # in the simulation.
         self.dummyParticle = Particle(position=np.array([0.0, 0.0, 0.0]), velocity=np.array([0.0, 0.0, 0.0])
@@ -91,12 +94,17 @@ class SimulationConservationLawsClass(AbstractSimulationClass):
         # greater than the initial bunchPositionSpread.
         distanceBetweenPositions = (
         self.inverseResolution * self.particleBunch.bunchPositionSpread * 10)
+
         for i in range(self.spaceResolution + 1):
             for j in range(self.spaceResolution + 1):
                 for k in range(self.spaceResolution + 1):
+                    
+                    # list of positions is rounded to 5dp to remove floating point errors and allows
+                    # for small scale simulations with very small distances.
                     listOfPositions.append(np.round(np.array(
                     [distanceBetweenPositions * i, distanceBetweenPositions * j, distanceBetweenPositions * k] 
                     , dtype=float), decimals=5))
+
         self.listOfPositions = listOfPositions
     
     def CreateDictionary(self):
@@ -108,11 +116,14 @@ class SimulationConservationLawsClass(AbstractSimulationClass):
                 dictionary (dictionary): A dictionary that is created with the positions
                     of field testing with keys as tuples.
         """
-        dictionary = {}
-        for i in self.listOfPositions:
-            dictionary.update({tuple(i.tolist()) : None })
+        dictionary = {} # dummy variable
+
         # dictionary with keys relating to the positions in the simulation that
         # energy density will be measured
+        # dictionary is initially empty
+        for i in self.listOfPositions:
+            dictionary.update({tuple(i.tolist()) : None })
+        
         self.dictionaryOfEnergyDensity = dictionary
     
     def EnergyDensity(self, timeElapsed):
@@ -134,13 +145,15 @@ class SimulationConservationLawsClass(AbstractSimulationClass):
                     elecric field components of energy
         """
         electromagneticFields = self.totalEMField.SumOfEMFields(self.dummyParticle, timeElapsed)
+
         energyDensityElectricFields = (const.epsilon_0 / 2) * np.dot(electromagneticFields[0]
         , electromagneticFields[0])
+
         energyDensityMagneticFields = (const.mu_0 / 2) * np.dot(electromagneticFields[1]
         , electromagneticFields[1])
+
         return energyDensityElectricFields + energyDensityMagneticFields
         
-
     def DictionaryOfEnergyDensity(self, timeElapsed):
         """ Updates the value corresponding to each key (a position in the simulation) with the energy
                 density at that point.
@@ -148,13 +161,13 @@ class SimulationConservationLawsClass(AbstractSimulationClass):
             Args:
                 timeElapsed (float): Time that has elapsed in the current simulation
         """
+         # update the value for each key in the dictionary with the new energy density
         for i in self.listOfPositions:
             self.dummyParticle.position = i
             self.dictionaryOfEnergyDensity[tuple(i.tolist())] = SimulationConservationLawsClass.EnergyDensity(self, timeElapsed=timeElapsed)
-            # update the value for each key in the dictionary with the new energy density
 
     def IntegrateEnergyDensity(self, timeElapsed):
-        """ Performs a modified Rienmann Sum across three dimensions to integrate the energy density 
+        """ Performs a modified Rienmann Sum in three dimensions to integrate the energy density 
                 from the electric and magnetic fields from the particles. The total volume of the simulation
                 is separated into small cubes with eight corners each. The mean energy density of each of the
                 eight corners for each cube is calculated and multiplied by the volume of that cube.
@@ -172,17 +185,31 @@ class SimulationConservationLawsClass(AbstractSimulationClass):
                 integralOfEnergy (float): The resulting sum of the integrals of energy contained in the 
                     electromagnetic fields at each timestep in the simulation.
         """
-        SimulationConservationLawsClass.DictionaryOfEnergyDensity(self, timeElapsed=timeElapsed)
+        SimulationConservationLawsClass.DictionaryOfEnergyDensity(self, timeElapsed=timeElapsed) # update the saved energies
+
+        # distance between points that are inspected in the simulation space
         distance = self.inverseResolution * self.particleBunch.bunchPositionSpread * 10
-        integralOfEnergy = 0.0
-        for i in range(self.spaceResolution):
-            for j in range(self.spaceResolution):
-                for k in range(self.spaceResolution):
+        integralOfEnergy = 0.0 # dummy variable
+
+        # This iterates through all of the cubes in the simulation space. As it uses i and i+1 to reference
+        # each pair of parallel points in a cube, the range stops after spaceResolution * distance rather
+        # than (spaceResolution + 1) * distance, like in CreateListOfPositions. 
+        for i in np.arange(start=0.0, stop=round(distance * self.spaceResolution, ndigits=5), step=round(distance, ndigits=5)):
+            for j in np.arange(start=0.0, stop=distance * self.spaceResolution, step=round(distance, ndigits=5)):
+                for k in np.arange(start=0.0, stop=distance * self.spaceResolution, step=round(distance, ndigits=5)):
+                    
                     # determine the mean energy density for each cube using its corners
-                    mean = (self.dictionaryOfEnergyDensity[(round(i*distance,ndigits=5),round(j*distance,ndigits=5),round(k*distance,ndigits=5))] + self.dictionaryOfEnergyDensity[(round(i*distance+distance,ndigits=5),round(j*distance,ndigits=5),round(k*distance,ndigits=5))]
-                    + self.dictionaryOfEnergyDensity[(round(i*distance,ndigits=5),round(j*distance+distance,ndigits=5),round(k*distance,ndigits=5))] + self.dictionaryOfEnergyDensity[(round(i*distance+distance,ndigits=5),round(j*distance+distance,ndigits=5),round(k*distance,ndigits=5))]
-                    + self.dictionaryOfEnergyDensity[(round(i*distance,ndigits=5),round(j*distance,ndigits=5),round(k*distance+distance,ndigits=5))] + self.dictionaryOfEnergyDensity[(round(i*distance+distance,ndigits=5),round(j*distance,ndigits=5),round(k*distance+distance,ndigits=5))]
-                    + self.dictionaryOfEnergyDensity[(round(i*distance,ndigits=5),round(j*distance+distance,ndigits=5),round(k*distance+distance,ndigits=5))] + self.dictionaryOfEnergyDensity[(round(i*distance+distance,ndigits=5),round(j*distance+distance,ndigits=5),round(k*distance+distance,ndigits=5))]
+                    # floating point errors are common here, so every value must be rounded to 5dp
+                    # without the round statements, expressions look like:
+                    # self.dictionaryOfEnergyDensity[(i+distance,j,k)]
+                    mean = (self.dictionaryOfEnergyDensity[(round(i, ndigits=5),round(j, ndigits=5),round(k, ndigits=5))] 
+                    + self.dictionaryOfEnergyDensity[(round(i+distance, ndigits=5),round(j, ndigits=5),round(k, ndigits=5))]
+                    + self.dictionaryOfEnergyDensity[(round(i, ndigits=5),round(j+distance, ndigits=5),round(k, ndigits=5))] 
+                    + self.dictionaryOfEnergyDensity[(round(i+distance, ndigits=5),round(j+distance, ndigits=5),round(k, ndigits=5))]
+                    + self.dictionaryOfEnergyDensity[(round( i, ndigits=5),round(j, ndigits=5),round(k+distance, ndigits=5))] 
+                    + self.dictionaryOfEnergyDensity[(round(i+distance, ndigits=5),round(j, ndigits=5),round(k+distance, ndigits=5))]
+                    + self.dictionaryOfEnergyDensity[(round(i, ndigits=5),round(j+distance, ndigits=5),round(k+distance, ndigits=5))] 
+                    + self.dictionaryOfEnergyDensity[(round(i+distance, ndigits=5),round(j+distance, ndigits=5),round(k+distance, ndigits=5))]
                     / float(8))
 
                     integralOfEnergy += mean * (distance*distance*distance)
@@ -206,48 +233,65 @@ class SimulationConservationLawsClass(AbstractSimulationClass):
                 simulationEnergyParticles (float): Energy of the simulation that is stored in the
                     kinetic energy of the particles, the total energy minus the rest energy
         """
+        # stops the simulation if external fields are added
         if (len(self.totalEMField.listOfElectricFields) != 0 or
         len(self.totalEMField.listOfMagneticFields) != 0):
             print("Remove any external fields from this simulation in order to continue.")
             return None
 
         timeElapsed = 0.0
-        timestep = self.largeTimestep
-        particlesOutOfBounds = 0
+        timestep = self.largeTimestep # only the largeTimestep is used in this simulation
+
+        # number of particles that are out of bounds of the simulation. If greater than 0
+        # the simulation is stopped
+        # this is because only a small volume of space can be tested to measure EM field energy
+        # and this result is inaccurate if particles leave the simulation space
+        particlesOutOfBounds = 0  
         
         while timeElapsed < self.duration:
 
             for i in range(self.particleBunch.numberOfParticles):
                 for j in range(3):
+                    # if any of the components of a particle's position fall outside of the boundaries of 
+                    # how far the electromagnetic field energy is tested, the simulation is ended. 
                     if (self.particleBunch.listOfParticles[i].position[j] < 0.0 or 
-                    self.particleBunch.listOfParticles[i].position[j] > 2 * self.particleBunch.bunchPositionMean):
+                    self.particleBunch.listOfParticles[i].position[j] > 10 * self.particleBunch.bunchPositionSpread):
                         particlesOutOfBounds += 1
-                        # if any of the components of a particle's position fall outside of the boundaries of 
-                        # how far the electromagnetic field energy is tested, the simulation is ended. 
-            if particlesOutOfBounds != 0:
-                print("The simulation was halted after %s secs as particles escaped the testing volume\
+                        
+            if particlesOutOfBounds < 0:
+                print("The simulation was halted after %s secs as particles escaped the testing volume\n\
                 and the calculation of energy from fields became inaccurate."
                 %(timeElapsed))
                 break
-            self.simulationTime.append(deepcopy(timeElapsed))
-            self.simulationState.append(deepcopy(self.particleBunch.listOfParticles))
 
+            self.simulationTime.append(deepcopy(timeElapsed)) # save elapsed time
+            self.simulationState.append(deepcopy(self.particleBunch.listOfParticles)) # save state of all particles
+
+            # save total momentum of all particles
             simulationMomentum = np.linalg.norm(sum([self.particleBunch.listOfParticles[i].Momentum() 
             for i in range(self.particleBunch.numberOfParticles)]))
-            self.simulationMomentum.append(deepcopy(simulationMomentum))
+            self.simulationMomentum.append(deepcopy(simulationMomentum)) 
 
+            # save total angular momentum of all particle
             simulationAngularMomentum = np.linalg.norm(sum([np.cross(
             self.particleBunch.listOfParticles[i].position, self.particleBunch.listOfParticles[i].Momentum()) 
             for i in range(self.particleBunch.numberOfParticles)]))
-            self.simulationAngularMomentum.append(deepcopy(simulationAngularMomentum))
+            self.simulationAngularMomentum.append(deepcopy(simulationAngularMomentum)) 
 
+            # save total potential energy in electromagnetic fields in the simulation space
             simulationEnergyFields = SimulationConservationLawsClass.IntegrateEnergyDensity(self, timeElapsed=timeElapsed)
+            self.simulationEnergyFields.append(deepcopy(simulationEnergyFields))
+
+            # save total kinetic energy of all particles
             simulationEnergyParticles = sum([self.particleBunch.listOfParticles[i].KineticEnergy() for i in 
             range(self.particleBunch.numberOfParticles)])
-            self.simulationEnergyFields.append(deepcopy(simulationEnergyFields))
             self.simulationEnergyParticles.append(deepcopy(simulationEnergyParticles))
             
+            # give all particles correct acceleration by determining the total electric
+            # and magnetic fields that act on the particles
             self.totalEMField.GiveAcceleration(self.particleBunch, timeElapsed)
+
+            # apply the euler cromer method to update the velocity and position of all particles
             for i in range(len(self.particleBunch.listOfParticles)):
                 self.particleBunch.listOfParticles[i].UpdateCromer(timestep)
 
@@ -269,6 +313,7 @@ class SimulationConservationLawsClass(AbstractSimulationClass):
         , 'EnergyFields':self.simulationEnergyFields, 'Momentum':self.simulationMomentum
         , 'AngularMomentum': self.simulationAngularMomentum
         , 'EnergyParticles':self.simulationEnergyParticles}
+
         dataFrame = pd.DataFrame(dictionary)
         dataFrame.to_pickle("%s.pkl"%(fileName))
         

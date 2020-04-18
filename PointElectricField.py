@@ -36,15 +36,16 @@ class PointElectricFieldClass(AbstractPointFieldClass):
                     electric field
             
             Parameters:
-                displacement (numpy array): The vector that represents the position of 
+                displacement (ndarray): The vector that represents the position of 
                     the source particle subtracted from the position of the affected particle.
                 distance (float): The norm of the displacement between the two particles
             
             Returns:
-                Electric Field (numpy array): The electric field that acts on the affectedParticle
+                Electric Field (ndarray): The electric field that acts on the affectedParticle
                     , originating from the sourceParticle.
         """
         displacement = affectedParticle.position - self.sourceParticle.position
         distance = np.linalg.norm(displacement)
+        
         return (self.sourceParticle.charge * displacement / (4 * const.pi * const.epsilon_0  
         * distance * distance * distance))

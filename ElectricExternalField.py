@@ -4,7 +4,7 @@ class ElectricExternalFieldClass(AbstractExternalFieldClass):
     """ Class for generating oscillating electric fields.
 
         Class Attributes:
-            electricfieldStrength (numpy array): Amplitude of electric field in 3D space
+            electricfieldStrength (ndarray): Amplitude of electric field in 3D space
             angularFrequency (float): Angular frequency of EM field 
             phaseShift (float): Phase shift of oscillating cosine function (units of 2*pi)
             name (str): Name of EM field
@@ -20,9 +20,9 @@ class ElectricExternalFieldClass(AbstractExternalFieldClass):
                 as electricFieldStrength to use the GenerateField method in the parent class.
             
             Args:
-                electricfieldStrength (numpy array): Amplitude of electric field in 3D space
+                electricfieldStrength (ndarray): Amplitude of electric field in 3D space
                 angularFrequency (float): Angular frequency of EM field 
-                phaseShift (float): Phase shift of oscillating cosine function (units of 2*pi)
+                phaseShift (float): Phase shift of oscillating cosine function (Fraction of a period)
                 name (str): Name of EM field
                 listOfDimensions (list): List of maximum and minimum dimensions
                     of the field in 3D space
@@ -45,6 +45,6 @@ class ElectricExternalFieldClass(AbstractExternalFieldClass):
                 affectedParticle (object: Particle): The particle being affected by the electric field
             
             Returns:
-                Electric Field (numpy array): The electric field affecting the particle
+                Electric Field (ndarray): The electric field affecting the particle
         """
         return super().GenerateField(timeElapsed, affectedParticle)

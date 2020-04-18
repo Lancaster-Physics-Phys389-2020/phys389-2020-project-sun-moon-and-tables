@@ -4,8 +4,6 @@ import matplotlib as mpl
 import math as math
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
-from copy import deepcopy 
-
 
 class PlottingClass:
     """ Class that contains all plotting methods.
@@ -57,10 +55,10 @@ class PlottingClass:
             for j in range(numberOfParticles):
                 ax.plot(inputData[j][0], inputData[j][1], inputData[j][2]
                 , label='%s'%(self.LoadSim.Simulation[0][j].name))
-            plt.title("figureTitle")
+            plt.title("Position of particles over time")
             ax.set_xlabel("x position (m)"), ax.set_ylabel("y position (m)"), ax.set_zlabel("z position (m)")
             ax.legend()
-            # plt.savefig("%s 3D position.jpg"%(self.fileName))
+            plt.savefig("%s 3D position.jpg"%(self.fileName))
             plt.show()
 
         except:
@@ -78,12 +76,11 @@ class PlottingClass:
         """
         try:
             fig = plt.figure()
-            plt.plot(self.LoadSim.Time, self.LoadSim.Energy, label='Energy Plot baby')
+            plt.plot(self.LoadSim.Time, self.LoadSim.Energy)
             plt.xlabel("Time (s)"), plt.ylabel("Mean Energy (J)")
-            plt.title("figureTitle")
+            plt.title("Mean energy of particles over time")
 
-            plt.legend()
-            # plt.savefig("%s mean energy.jpg"%(self.fileName))
+            plt.savefig("%s mean energy.jpg"%(self.fileName))
             plt.show()
         except:
             AttributeError
@@ -100,12 +97,11 @@ class PlottingClass:
         """
         try:
             fig = plt.figure()
-            plt.plot(self.LoadSim.Time, self.LoadSim.Spread, label='Spread Plot baby')
+            plt.plot(self.LoadSim.Time, self.LoadSim.Spread)
             plt.xlabel("Time (s)"), plt.ylabel("Energy Spread Std. (J)")
-            plt.title("figureTitle")
+            plt.title("Standard deviation of energy of particles over time")
 
-            plt.legend()
-            # plt.savefig("%s energy spread.jpg"%(self.fileName))
+            plt.savefig("%s energy spread.jpg"%(self.fileName))
             plt.show()
         except:
             AttributeError
@@ -137,12 +133,11 @@ class PlottingClass:
                 inputData.append(np.linalg.norm(velocitySum / numberOfParticles))
 
             fig = plt.figure()
-            plt.plot(self.LoadSim.Time, inputData, label='Velocity Plot baby')
+            plt.plot(self.LoadSim.Time, inputData)
             plt.xlabel("Time (s)"), plt.ylabel("Velocity (ms$^{-1}$)")
-            plt.title("figureTitle")
+            plt.title("Mean velocity of particles over time")
             
-            plt.legend()
-            # plt.savefig("%s Mean particle velocity.jpg"%(self.fileName))
+            plt.savefig("%s Mean particle velocity.jpg"%(self.fileName))
             plt.show()
         except:
             AttributeError
@@ -160,11 +155,12 @@ class PlottingClass:
         """
         try:
             fig = plt.polar(self.LoadSim.Phase * 2 * math.pi, self.LoadSim.FinalSpread
-            , label='Spread plot baby')
-            plt.title("figureTitle")
+            , label='Final Energy Spread Std. dev. (J)')
+            plt.xlabel("Phase Shift ($\degree$)")
+            plt.title("Final standard deviation in energy of particles for varying phase shifts")
 
-            plt.legend(loc=2)
-            # plt.savefig("%s phase change final energy spread.jpg"%(self.fileName))
+            plt.legend(loc="best")
+            plt.savefig("%s phase change final energy spread.jpg"%(self.fileName))
             plt.show()
         except:
             AttributeError
@@ -185,12 +181,12 @@ class PlottingClass:
         """
         try:
             fig = plt.figure()
-            plt.plot(self.LoadSim.Phase, self.LoadSim.FinalSpread, label='Spread Plot baby')
-            plt.xlabel("Phase Change as a Fraction of a Period (no units)"), plt.ylabel("Final Energy Spread Std. (J)")
-            plt.title("figureTitle")
+            plt.plot(self.LoadSim.Phase * 360, self.LoadSim.FinalSpread)
+            plt.xlabel("Phase Change ($\degree$)"), plt.ylabel("Final Energy Spread Std. dev. (J)")
+            plt.title("Final standard deviation in energy of particles for varying phase shifts")
             plt.yscale(yscale)
-            plt.legend(loc=4)
-            # plt.savefig("%s phase change final energy spread.jpg"%(self.fileName))
+
+            plt.savefig("%s phase change final energy spread.jpg"%(self.fileName))
             plt.show()
         except:
             AttributeError
@@ -206,11 +202,11 @@ class PlottingClass:
         """
         try:
             fig = plt.figure()
-            plt.plot(self.LoadSim.Time, self.LoadSim.Momentum, label='Momentum plot baby')
+            plt.plot(self.LoadSim.Time, self.LoadSim.Momentum)
             plt.xlabel("Time (s)"), plt.ylabel("Total Momentum of the Simulation (kgms$^{-1}$)")
-            plt.title("figureTitle")
-            plt.legend(loc=2)
-            # plt.savefig("%s total momentum of simulation over time.jpg"%(self.fileName))
+            plt.title("Total momentum of particles over time")
+
+            plt.savefig("%s total momentum of simulation over time.jpg"%(self.fileName))
             plt.show()
         except:
             AttributeError
@@ -227,11 +223,11 @@ class PlottingClass:
         """
         try:
             fig = plt.figure()
-            plt.plot(self.LoadSim.Time, self.LoadSim.EnergyFields, label='Fields plot baby')
+            plt.plot(self.LoadSim.Time, self.LoadSim.EnergyFields)
             plt.xlabel("Time (s)"), plt.ylabel("Total energy of fields in the simulation (J)")
-            plt.title("figureTitle")
-            plt.legend(loc=2)
-            # plt.savefig("%s total energy of simulation over time.jpg"%(self.fileName))
+            plt.title("Total potential energy in electromagnetic fields over time")
+
+            plt.savefig("%s total energy of simulation over time.jpg"%(self.fileName))
             plt.show()
         except:
             AttributeError
@@ -247,11 +243,11 @@ class PlottingClass:
         """
         try:
             fig = plt.figure()
-            plt.plot(self.LoadSim.Time, self.LoadSim.EnergyParticles, label='Particle plot baby')
+            plt.plot(self.LoadSim.Time, self.LoadSim.EnergyParticles)
             plt.xlabel("Time (s)"), plt.ylabel("Total kinetic energy of particles in the simulation (J)")
-            plt.title("figureTitle")
-            plt.legend(loc=2)
-            # plt.savefig("%s total energy of simulation over time.jpg"%(self.fileName))
+            plt.title("Total kinetic energy of particles over time")
+
+            plt.savefig("%s total energy of simulation over time.jpg"%(self.fileName))
             plt.show()
         except:
             AttributeError
@@ -268,11 +264,11 @@ class PlottingClass:
         """
         try:
             fig = plt.figure()
-            plt.plot(self.LoadSim.Time, self.LoadSim.AngularMomentum, label='Ang Mom plot baby')
+            plt.plot(self.LoadSim.Time, self.LoadSim.AngularMomentum)
             plt.xlabel("Time (s)"), plt.ylabel("Total angular momentum of the simulation (kgm$^{2}$s$^{-1}$)")
-            plt.title("figureTitle")
-            plt.legend(loc=2)
-            # plt.savefig("%s total angular momentum of simulation over time.jpg"%(self.fileName))
+            plt.title("Total angular momentum of particles over time")
+
+            plt.savefig("%s total angular momentum of simulation over time.jpg"%(self.fileName))
             plt.show()
         except:
             AttributeError

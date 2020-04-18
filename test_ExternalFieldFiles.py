@@ -65,13 +65,16 @@ def test_GenerateMagneticField():
     assert [fieldArray[i] for i in range(3)] == pytest.approx([-5.97251874, -6.82573571, -7.67895267], rel=0.06)
 
 def test_MagneticSynchrotronField__repr__():
+    # checks the repr function works
     assert re.findall(
         "Magnetic Synchrotron Field: test_Magnetic Synchrotron Field", test_MagneticSynchrotronField.__repr__()) == ["Magnetic Synchrotron Field: test_Magnetic Synchrotron Field"]
 
 def test_SynchrotronConstantRadius():
+    # test that the magnetic field is correctly increased to fix the radius during the simulation
     assert test_MagneticSynchrotronField.ConstantRadius() == pytest.approx(1.0, rel=0.01)
 
 def test_GenerateSynchrotronMagneticField():
+    # test that the magnetic field is calculated correctly
     fieldArray = test_MagneticSynchrotronField.GenerateField(timeElapsed=1.0, affectedParticle=test_ParticleBunch.listOfParticles[0])
     assert [fieldArray[i] for i in range(3)] == pytest.approx([-5.97251874, -6.82573571, -7.67895267], rel=0.06)
 
